@@ -38,3 +38,4 @@ Baseado no layout conceitual gerado na V3 (visual batizado como "VOXELSCRIPT 3.2
 ## 5. Grade de Prévia Sprint (Bottom-Tiles)
 - **8-Direction Render Array:** Localizada na fundação da área 3D (Rodapé esquerdo) ou base geral inferior do aplicativo, existirá uma esteira contínua apresentando **8 Tiles Quadráticos Fixos**. Eles monitoram o Voxel ao vivo fatiando-o em visualização plena a 0°, 45°, 90°, etc.
 - **Flat-Render (Modo sem Sombras):** Como requisito absoluto para geração limpa de *Sprites/QOI Assets*, estes 8 quadrados exibirão a engrenagem livre de modelagem de luzes nativas — o visualizador 3D principal pode possuir iluminação dramática, mas o *Bottom-Tiles* deve sempre exibir cores absolutas "sem renderizar sombras" (Albedo Nativo).
+- **Consolidated GIF Export:** Além da geração de arquivos individuais `.qoi`, o exportador deve gerar um arquivo `.gif` único contendo a animação das 8 direções em loop, facilitando a prévia rápida do asset fora da engine.

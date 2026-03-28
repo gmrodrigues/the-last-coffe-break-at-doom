@@ -20,6 +20,7 @@ Este documento audita a implementação atual do **Voxel Forge V3** (`src/voxel_
 | **8-Direction Tiles**| 8-Tile Array | ✅ **OK** | Esteira de 8 painéis para ângulos 0° a 315°. |
 | | Flat-Render | ✅ **OK** | Renderiza Albedo puro (sem sombras) para os tiles. |
 | | QOI Export | ✅ **OK** | Exportação paralela de 8 sprites via tecla 'P' ou botão. |
+| | Animated GIF | ❌ **MISSING** | Geração automática de arquivo .gif único com as 8 direções. |
 
 ---
 

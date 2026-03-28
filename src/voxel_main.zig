@@ -1,6 +1,7 @@
 const std = @import("std");
 const qoi = @import("qoi.zig");
 const font = @import("font.zig");
+const gif = @import("gif.zig");
 const c = @cImport({ @cInclude("SDL2/SDL.h"); });
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -284,21 +285,56 @@ fn mergeLayers(layers: []const Layer, active_axis: Axis, active_layer: i32) [GRI
 
 // ─── Export QOI ───────────────────────────────────────────────────────────────
 fn exportSprites(allocator: std.mem.Allocator, grid: *const [GRID][GRID][GRID]u8) !void {
-    var buf: [TILE_W * TILE_H]u32 = @splat(0);
+    var frames_indices = try allocator.alloc([]u8, 8);
+    defer {
+        for (frames_indices) |f| allocator.free(f);
+        allocator.free(frames_indices);
+    }
+
     for (0..8) |a| {
-        @memset(&buf, 0);
+        var buf: [TILE_W * TILE_H]u32 = @splat(0);
+        var indices = try allocator.alloc(u8, TILE_W * TILE_H);
+        @memset(indices, 0);
+        frames_indices[a] = indices;
+
         var rvox: [GRID * GRID * GRID + 1]RVoxel = undefined;
         const n = projectGrid(&rvox, grid, @intCast(a), .Z, 0,
                               TILE_W / 2, TILE_H / 2 + 10, true);
-        // rasterize into buf
-        _ = n;
+        
+        // Rasterize into both RGBA (for QOI) and Indices (for GIF)
+        for (rvox[0..n]) |vx| {
+            for (0..4) |oy| {
+                for (0..4) |ox| {
+                    const px = vx.sx + @as(i32, @intCast(ox)) - 2;
+                    const py = vx.sy + @as(i32, @intCast(oy)) - 2;
+                    if (px >= 0 and px < TILE_W and py >= 0 and py < TILE_H) {
+                        const idx = @as(usize, @intCast(py * TILE_W + px));
+                        buf[idx] = vx.rgba;
+                        // Find palette index (naive but okay for 8 colors)
+                        for (PALETTE, 0..) |pc, pi| {
+                            if (pc == (vx.rgba | 0x000000FF)) { // ignore alpha for match
+                                indices[idx] = @intCast(pi);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         const data = try qoi.encode(allocator, TILE_W, TILE_H, &buf);
         defer allocator.free(data);
         var name: [64]u8 = undefined;
         const path = try std.fmt.bufPrint(&name, "assets/voxel_{}.qoi", .{a});
         try std.fs.cwd().writeFile(.{ .sub_path = path, .data = data });
     }
-    std.debug.print("Exported 8 direction sprites to assets/\n", .{});
+
+    // Export Consolidated GIF
+    const gif_data = try gif.encode(allocator, TILE_W, TILE_H, @ptrCast(frames_indices), &PALETTE);
+    defer allocator.free(gif_data);
+    try std.fs.cwd().writeFile(.{ .sub_path = "assets/voxel_anim.gif", .data = gif_data });
+
+    std.debug.print("Exported 8 sprites and voxel_anim.gif to assets/\n", .{});
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
