@@ -1,0 +1,19 @@
+# Zig Build Artifacts
+zig-cache/
+zig-out/
+.zig-cache/
+
+# Executáveis gerados
+tlc_at_doom
+tlc_editor
+
+# Editor & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Opcional: Descomente se não quiser versionar os assets gerados localmente
+# assets/*.qoi
