@@ -54,6 +54,8 @@ pub const DesktopManager = struct {
     pub fn deinit(self: *DesktopManager) void {
         for (self.icons.items) |icon| {
             c.SDL_DestroyTexture(icon.texture);
+            self.allocator.free(icon.name);
+            self.allocator.free(icon.exec_path);
         }
         self.icons.deinit(self.allocator);
         c.SDL_DestroyRenderer(self.renderer);
@@ -61,7 +63,37 @@ pub const DesktopManager = struct {
         c.SDL_Quit();
     }
     
-    pub fn addTool(self: *DesktopManager, name: []const u8, path: []const u8, icon_path: []const u8) !void {
+    pub fn loadTools(self: *DesktopManager, path: []const u8) !void {
+        const file_content = try std.fs.cwd().readFileAlloc(self.allocator, path, 1024 * 1024);
+        defer self.allocator.free(file_content);
+        
+        var iter = std.mem.tokenizeAny(u8, file_content, "\r\n");
+        var current_name: ?[]const u8 = null;
+        var current_icon: ?[]const u8 = null;
+        var current_exec: ?[]const u8 = null;
+        
+        while (iter.next()) |line| {
+            const trimmed = std.mem.trimLeft(u8, line, " -");
+            if (std.mem.startsWith(u8, trimmed, "name:")) {
+                current_name = std.mem.trim(u8, trimmed[5..], " \"");
+            } else if (std.mem.startsWith(u8, trimmed, "icon:")) {
+                current_icon = std.mem.trim(u8, trimmed[5..], " \"");
+            } else if (std.mem.startsWith(u8, trimmed, "exec:")) {
+                current_exec = std.mem.trim(u8, trimmed[5..], " \"");
+            }
+            
+            if (current_name != null and current_icon != null and current_exec != null) {
+                try self.addTool(
+                    try self.allocator.dupe(u8, current_name.?),
+                    try self.allocator.dupe(u8, current_exec.?),
+                    current_icon.?
+                );
+                current_name = null; current_icon = null; current_exec = null;
+            }
+        }
+    }
+    
+    fn addTool(self: *DesktopManager, name: []const u8, path: []const u8, icon_path: []const u8) !void {
         const file = try std.fs.cwd().readFileAlloc(self.allocator, icon_path, 1024 * 1024);
         defer self.allocator.free(file);
         
@@ -97,7 +129,6 @@ pub const DesktopManager = struct {
             
             // Program Manager Title Bar Interaction
             if (mx >= self.pm_x and mx <= self.pm_x + self.pm_w and my >= self.pm_y and my <= self.pm_y + 20) {
-                // Minimize Button
                 if (mx >= self.pm_x + self.pm_w - 20) {
                     self.pm_minimized = !self.pm_minimized;
                 } else {
@@ -148,7 +179,7 @@ pub const DesktopManager = struct {
         _ = c.SDL_SetRenderDrawColor(r, 0, 128, 128, 255);
         _ = c.SDL_RenderClear(r);
         
-        // Program Manager Window
+        // Window
         const win_h = if (self.pm_minimized) 20 else self.pm_h;
         const win_rect = c.SDL_Rect{ .x = self.pm_x, .y = self.pm_y, .w = self.pm_w, .h = win_h };
         
@@ -160,12 +191,7 @@ pub const DesktopManager = struct {
         const title_rect = c.SDL_Rect{ .x = self.pm_x, .y = self.pm_y, .w = self.pm_w, .h = 20 };
         _ = c.SDL_RenderFillRect(r, &title_rect);
         
-        // Minimize Button
-        _ = c.SDL_SetRenderDrawColor(r, 192, 192, 192, 255);
-        const min_btn = c.SDL_Rect{ .x = self.pm_x + self.pm_w - 18, .y = self.pm_y + 2, .w = 16, .h = 16 };
-        _ = c.SDL_RenderFillRect(r, &min_btn);
-        
-        // Grid Icons
+        // Grid
         if (!self.pm_minimized) {
             const start_x = self.pm_x + 20;
             const start_y = self.pm_y + 40;
@@ -185,17 +211,15 @@ pub const DesktopManager = struct {
                     _ = c.SDL_RenderDrawRect(r, &border);
                 }
                 
-                // Label background (black area for "text")
+                // Label (Black placeholder for text)
                 _ = c.SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
-                const label_rect = c.SDL_Rect{ .x = icon_x, .y = icon_y + 35, .w = 64, .h = 10 };
-                _ = c.SDL_RenderFillRect(r, &label_rect);
+                const label_r = c.SDL_Rect{ .x = icon_x, .y = icon_y + 35, .w = 64, .h = 10 };
+                _ = c.SDL_RenderFillRect(r, &label_r);
             }
         }
         
-        // Outer Border
         _ = c.SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
         _ = c.SDL_RenderDrawRect(r, &win_rect);
-        
         c.SDL_RenderPresent(r);
     }
 };
@@ -208,10 +232,8 @@ pub fn main() !void {
     var desktop = try DesktopManager.init(allocator);
     defer desktop.deinit();
     
-    // Grid Setup
-    try desktop.addTool("Voxel", "./zig-out/bin/tlc_voxel", "assets/wall.qoi");
-    try desktop.addTool("Editor", "./zig-out/bin/tlc_editor", "assets/server.qoi");
-    try desktop.addTool("Game", "./zig-out/bin/tlc_at_doom", "assets/weapon.qoi");
+    // Load metadata
+    try desktop.loadTools("assets/tools.yaml");
     
     var event: c.SDL_Event = undefined;
     while (true) {

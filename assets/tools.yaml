@@ -1,0 +1,14 @@
+# DOOM_OS_311 TOOL METADATA
+# This file defines the available tools for the Program Manager.
+# mascot: Nano Banana (v1.0.2)
+
+tools:
+  - name: "Voxel Forge"
+    icon: "assets/banana_voxel.qoi"
+    exec: "./zig-out/bin/tlc_voxel"
+  - name: "Content Editor"
+    icon: "assets/banana_editor.qoi"
+    exec: "./zig-out/bin/tlc_editor"
+  - name: "Main Game"
+    icon: "assets/banana_game.qoi"
+    exec: "./zig-out/bin/tlc_at_doom"

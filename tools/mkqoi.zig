@@ -141,4 +141,46 @@ pub fn main() !void {
     ".......YY......." ++
     "................";
     try genTexFile(allocator, "assets/flash.qoi", 16, 16, FLASH_STR);
+
+    // --- NANO BANANA ICONS ---
+    const B_VOXEL = 
+    "................" ++
+    ".......YY......." ++
+    "......YYYY......" ++
+    ".....Y####Y....." ++
+    ".....Y####Y....." ++
+    "....@@@@@@@@...." ++
+    "...@@@@@@@@@@..." ++
+    "...@@@@@@@@@@..." ++
+    "...@@@@@@@@@@..." ++
+    "...##########..." ++
+    "................";
+    try genTexFile(allocator, "assets/banana_voxel.qoi", 16, 16, B_VOXEL);
+
+    const B_EDITOR = 
+    "................" ++
+    ".......YY......." ++
+    "......YYYY......" ++
+    ".....Y####Y....." ++
+    ".....Y####Y....." ++
+    "....@@@@@@@@...." ++
+    "...@@WWWWWW@@..." ++
+    "...@@WWWWWW@@..." ++
+    "...@@WWWWWW@@..." ++
+    "...##########..." ++
+    "................";
+    try genTexFile(allocator, "assets/banana_editor.qoi", 16, 16, B_EDITOR);
+
+    const B_GAME = 
+    "................" ++
+    ".......YY......." ++
+    "......YYYY......" ++
+    ".....Y####Y....." ++
+    "....RRRRRRRR...." ++
+    "...RRRRRRRRRR..." ++
+    "...RRRRRRRRRR..." ++
+    "...RRRRRRRRRR..." ++
+    "...##########..." ++
+    "................";
+    try genTexFile(allocator, "assets/banana_game.qoi", 16, 16, B_GAME);
 }

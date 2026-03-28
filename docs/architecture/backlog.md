@@ -5,7 +5,9 @@
 - [x] **RRA-005**: QOI Asset Texture Loading
 - [x] **RRA-006**: SDL2 Build System Integration
 - [x] **RRA-007**: Backlog System Formalization
-- [/] **RRA-015**: Grid-based Desktop Icon Layout (In Progress)
+- [x] **RRA-015**: Grid-based Desktop Icon Layout
+- [x] **RRA-016**: Dynamic Tool Metadata (YAML Integration)
+- [/] **RRA-017**: Automatic PNG-to-QOI Conversion & Caching (In Progress)
 
 ## ⏳ Next Steps (Sprint 2)
 - [ ] **RRA-008**: Window dragging/minimizing for DOOM_OS_311
