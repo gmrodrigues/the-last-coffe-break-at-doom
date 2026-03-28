@@ -4,18 +4,6 @@
 **exec**: docs/architecture/backlog.md
 
 ## 🚀 Current Sprint (The Desktop Initiative)
-- [x] **RRA-004**: DOOM_OS_311 Prototype (Sprint 1)
-- [x] **RRA-005**: QOI Asset Texture Loading
-- [x] **RRA-006**: SDL2 Build System Integration
-- [x] **RRA-007**: Backlog System Formalization
-- [x] **RRA-015**: Grid-based Desktop Icon Layout
-- [x] **RRA-016**: Dynamic Tool Metadata (YAML Integration)
-- [x] **RRA-017**: Automatic PNG-to-QOI Conversion & Caching
-- [x] **RRA-018**: [Modern FPS Movement](file:///home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/docs/domain/mechanics/modern_movement/modern_movement.md) (WASD + Mouse)
-- [x] **RRA-019**: [Physical Collision System](file:///home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/docs/domain/mechanics/collision/collision.md) (AABB Sliding)
-- [ ] **RRA-020**: [Interactive Object System](file:///home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/docs/domain/mechanics/interactive_objects/interactive_objects.md) (Directional Entities)
-
-## ⏳ Next Steps (Sprint 2)
 - [ ] **RRA-008**: Window dragging/minimizing for DOOM_OS_311
 - [ ] **RRA-009**: Real-time "Glitch-Injection" rendering hooks
 - [ ] **RRA-010**: Gaslight Dialogue Editor port to DOOM_OS_311
@@ -30,3 +18,13 @@
 - [x] **RRA-001**: Antigravity Skill System Bootstrap
 - [x] **RRA-002**: Voxel Forge V3 Baseline
 - [x] **RRA-003**: local PlantUML Rendering Integration
+- [x] **RRA-004**: DOOM_OS_311 Prototype (Sprint 1)
+- [x] **RRA-005**: QOI Asset Texture Loading
+- [x] **RRA-006**: SDL2 Build System Integration
+- [x] **RRA-007**: Backlog System Formalization
+- [x] **RRA-015**: Grid-based Desktop Icon Layout
+- [x] **RRA-016**: Dynamic Tool Metadata (YAML Integration)
+- [x] **RRA-017**: Automatic PNG-to-QOI Conversion & Caching
+- [x] **RRA-018**: [Modern FPS Movement] (WASD + Mouse)
+- [x] **RRA-019**: [Physical Collision System] (AABB Sliding)
+- [x] **RRA-020**: [Interactive Object System] (Sub-system compliance)
