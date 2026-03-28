@@ -4,11 +4,11 @@
 
 tools:
   - name: "Voxel Forge"
-    icon: "assets/voxel_icon.png"
+    icon: "assets/objects/icons/voxel_icon.png"
     exec: "./zig-out/bin/tlc_voxel"
   - name: "Content Editor"
-    icon: "assets/editor_icon.png"
+    icon: "assets/objects/icons/editor_icon.png"
     exec: "./zig-out/bin/tlc_editor"
   - name: "Main Game"
-    icon: "assets/game_icon.png"
+    icon: "assets/objects/icons/game_icon.png"
     exec: "./zig-out/bin/tlc_at_doom"

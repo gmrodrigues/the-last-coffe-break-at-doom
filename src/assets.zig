@@ -1,5 +1,5 @@
 const std = @import("std");
-const qoi = @import("qoi.zig");
+pub const qoi = @import("qoi.zig");
 
 pub const Texture = struct {
     width: usize,

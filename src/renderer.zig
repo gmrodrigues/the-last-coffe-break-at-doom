@@ -27,7 +27,7 @@ pub const Camera = struct {
 pub const Sprite = struct {
     x: f32,
     y: f32,
-    texture: *const assets.Texture,
+    textures: [8]*const assets.Texture,
 };
 
 pub const Renderer = struct {
@@ -40,7 +40,7 @@ pub const Renderer = struct {
         // Clear buffer
         @memset(&self.buffer, 0x000000FF); // Black background
 
-        // 1. FLOOR CASTING / CEILING CASTING could go here
+        // 1. FLOOR / CEILING (Optional)
         
         // 2. WALL CASTING
         for (0..SCREEN_WIDTH) |x| {
@@ -105,7 +105,6 @@ pub const Renderer = struct {
                 perp_wall_dist = (side_dist_y - delta_dist_y);
             }
 
-            // Save the perpendicular distance to the ZBuffer for sprite occlusion
             self.z_buffer[x] = perp_wall_dist;
 
             var line_height: i32 = 0;
@@ -120,7 +119,6 @@ pub const Renderer = struct {
             var draw_end: i32 = @divTrunc(line_height, 2) + @as(i32, SCREEN_HEIGHT) / 2;
             if (draw_end >= SCREEN_HEIGHT) draw_end = SCREEN_HEIGHT - 1;
 
-            // Calculate exact intersection X hit (wall_x)
             var wall_x: f32 = 0;
             if (side == 0) {
                 wall_x = camera.y + perp_wall_dist * ray_dir_y;
@@ -157,58 +155,61 @@ pub const Renderer = struct {
         
         // 3. SPRITE CASTING
         for (sprites) |sprite| {
-            // translate sprite position to relative to camera
             const sprite_x = sprite.x - camera.x;
             const sprite_y = sprite.y - camera.y;
 
-            // transform sprite with the inverse camera matrix
             const inv_det = 1.0 / (camera.plane_x * camera.dir_y - camera.dir_x * camera.plane_y);
             
             const transform_x = inv_det * (camera.dir_y * sprite_x - camera.dir_x * sprite_y);
-            // transform_y is depth inside the screen
             const transform_y = inv_det * (-camera.plane_y * sprite_x + camera.plane_x * sprite_y); 
             
-            if (transform_y <= 0) continue; // Behind camera plane
+            if (transform_y <= 0) continue; 
             
             const sprite_screen_x = @as(i32, @intFromFloat((@as(f32, SCREEN_WIDTH) / 2.0) * (1.0 + transform_x / transform_y)));
             
-            // calculate height of the sprite on screen
             const sprite_height = @as(i32, @intFromFloat(@as(f32, SCREEN_HEIGHT) / transform_y));
             var draw_start_y = -@divTrunc(sprite_height, 2) + @as(i32, SCREEN_HEIGHT) / 2;
             if (draw_start_y < 0) draw_start_y = 0;
             var draw_end_y = @divTrunc(sprite_height, 2) + @as(i32, SCREEN_HEIGHT) / 2;
             if (draw_end_y >= SCREEN_HEIGHT) draw_end_y = SCREEN_HEIGHT - 1;
             
-            // calculate width of the sprite
             const sprite_width = @as(i32, @intFromFloat(@as(f32, SCREEN_HEIGHT) / transform_y));
             var draw_start_x = -@divTrunc(sprite_width, 2) + sprite_screen_x;
             if (draw_start_x < 0) draw_start_x = 0;
             var draw_end_x = @divTrunc(sprite_width, 2) + sprite_screen_x;
             if (draw_end_x >= SCREEN_WIDTH) draw_end_x = SCREEN_WIDTH - 1;
             
-            // draw stripes
+            // --- 8-DIRECTION ANGLE SELECTION ---
+            // The texture depends on the relative angle between the player's view and the object
+            const world_angle = std.math.atan2(sprite_y, sprite_x);
+            const player_angle = std.math.atan2(camera.dir_y, camera.dir_x);
+            var relative_angle = world_angle - player_angle + std.math.pi + std.math.pi/8.0;
+            while (relative_angle < 0) relative_angle += 2 * std.math.pi;
+            while (relative_angle >= 2 * std.math.pi) relative_angle -= 2 * std.math.pi;
+            
+            const tex_index = @as(usize, @intFromFloat(relative_angle / (std.math.pi / 4.0))) % 8;
+            const texture = sprite.textures[tex_index];
+
             var stripe = draw_start_x;
             while (stripe < draw_end_x) : (stripe += 1) {
                 const u = @as(usize, @intCast(stripe));
-                if (u >= SCREEN_WIDTH) continue; // safety bounds check
+                if (u >= SCREEN_WIDTH) continue;
 
-                // ZBuffer check: only draw column if there's no wall closer
                 if (transform_y < self.z_buffer[u]) {
-                    const tex_x_f = (@as(f32, @floatFromInt(stripe)) - (@as(f32, @floatFromInt(sprite_screen_x)) - @as(f32, @floatFromInt(sprite_width)) / 2.0)) * @as(f32, @floatFromInt(sprite.texture.width)) / @as(f32, @floatFromInt(sprite_width));
+                    const tex_x_f = (@as(f32, @floatFromInt(stripe)) - (@as(f32, @floatFromInt(sprite_screen_x)) - @as(f32, @floatFromInt(sprite_width)) / 2.0)) * @as(f32, @floatFromInt(texture.width)) / @as(f32, @floatFromInt(sprite_width));
                     const tex_x: i32 = @intFromFloat(tex_x_f);
                     
-                    if (tex_x < 0 or tex_x >= sprite.texture.width) continue;
+                    if (tex_x < 0 or tex_x >= texture.width) continue;
 
                     var y: i32 = draw_start_y;
                     while (y < draw_end_y) : (y += 1) {
-                        const tex_y_f = (@as(f32, @floatFromInt(y)) - (@as(f32, @floatFromInt(SCREEN_HEIGHT)) / 2.0 - @as(f32, @floatFromInt(sprite_height)) / 2.0)) * @as(f32, @floatFromInt(sprite.texture.height)) / @as(f32, @floatFromInt(sprite_height));
+                        const tex_y_f = (@as(f32, @floatFromInt(y)) - (@as(f32, @floatFromInt(SCREEN_HEIGHT)) / 2.0 - @as(f32, @floatFromInt(sprite_height)) / 2.0)) * @as(f32, @floatFromInt(texture.height)) / @as(f32, @floatFromInt(sprite_height));
                         const tex_y: i32 = @intFromFloat(tex_y_f);
                         
-                        if (tex_y < 0 or tex_y >= sprite.texture.height) continue;
+                        if (tex_y < 0 or tex_y >= texture.height) continue;
                         
-                        const color = sprite.texture.get(@intCast(tex_x), @intCast(tex_y));
-                        if (color != 0) { // 0 is transparent
-                            // To match Doom style, scale the height by Y position in the screen buffer
+                        const color = texture.get(@intCast(tex_x), @intCast(tex_y));
+                        if (color != 0) { 
                             self.buffer[@as(usize, @intCast(y)) * SCREEN_WIDTH + u] = color;
                         }
                     }
@@ -264,3 +265,79 @@ pub const Renderer = struct {
         }
     }
 };
+
+test "Map boundary and collision" {
+    const map_data = [_]u8{
+        1, 1, 1,
+        1, 0, 1,
+        1, 1, 1,
+    };
+    const map = Map{
+        .width = 3,
+        .height = 3,
+        .data = &map_data,
+    };
+
+    try std.testing.expectEqual(@as(u8, 1), map.get(0, 0));
+    try std.testing.expectEqual(@as(u8, 0), map.get(1, 1));
+    try std.testing.expectEqual(@as(u8, 1), map.get(3, 3)); // boundary
+}
+
+test "Basic Raycasting Render" {
+    // Mock texture pixels
+    var pixels = [_]u32{0xFFFFFFFF} ** (16 * 16);
+    
+    const mock_qoi = assets.qoi.QoiImage{
+        .width = 16,
+        .height = 16,
+        .pixels = &pixels,
+        .allocator = std.testing.allocator,
+    };
+    
+    const tex = assets.Texture{
+        .width = 16,
+        .height = 16,
+        .pixels = &pixels,
+        .qoi_image = mock_qoi,
+    };
+
+    const map_data = [_]u8{
+        1, 1, 1,
+        1, 0, 1,
+        1, 1, 1,
+    };
+    const map = Map{
+        .width = 3,
+        .height = 3,
+        .data = &map_data,
+    };
+
+    var renderer = Renderer{
+        .map = map,
+        .buffer = undefined,
+        .z_buffer = undefined,
+        .wall_texture = &tex,
+    };
+
+    const camera = Camera{
+        .x = 1.5,
+        .y = 1.5,
+        .dir_x = 1.0,
+        .dir_y = 0.0,
+        .plane_x = 0.0,
+        .plane_y = 0.66,
+    };
+
+    const sprites = [_]Sprite{};
+    renderer.renderFrame(camera, &sprites);
+
+    // Verify buffer is no longer all black (at least some wall should be rendered)
+    var hit_wall = false;
+    for (renderer.buffer) |pixel| {
+        if (pixel != 0x000000FF) {
+            hit_wall = true;
+            break;
+        }
+    }
+    try std.testing.expect(hit_wall);
+}

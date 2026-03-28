@@ -102,7 +102,7 @@ pub fn main() !void {
     "...#@@@@@@@@#..." ++
     "...#@B@..@B@#..." ++
     "...##########...";
-    try genTexFile(allocator, "assets/server.qoi", 16, 16, SERVER_STR);
+    try genTexFile(allocator, "assets/objects/server/icon.qoi", 16, 16, SERVER_STR);
     
     const WEAPON_STR = 
     "................" ++
@@ -121,7 +121,7 @@ pub fn main() !void {
     "MMMMMWWWWWWMMMMM" ++
     "MMMMMMMMMMMMMMMM" ++
     "MMMMMMMMMMMMMMMM";
-    try genTexFile(allocator, "assets/weapon.qoi", 16, 16, WEAPON_STR);
+    try genTexFile(allocator, "assets/objects/weapon/weapon.qoi", 16, 16, WEAPON_STR);
     
     const FLASH_STR = 
     ".......YY......." ++
@@ -140,7 +140,7 @@ pub fn main() !void {
     "......YYYY......" ++
     ".......YY......." ++
     "................";
-    try genTexFile(allocator, "assets/flash.qoi", 16, 16, FLASH_STR);
+    try genTexFile(allocator, "assets/objects/weapon/flash.qoi", 16, 16, FLASH_STR);
 
     // --- NANO BANANA ICONS ---
     const B_VOXEL = 
@@ -155,7 +155,7 @@ pub fn main() !void {
     "...@@@@@@@@@@..." ++
     "...##########..." ++
     "................";
-    try genTexFile(allocator, "assets/banana_voxel.qoi", 16, 16, B_VOXEL);
+    try genTexFile(allocator, "assets/objects/bananas/voxel.qoi", 16, 16, B_VOXEL);
 
     const B_EDITOR = 
     "................" ++
@@ -169,7 +169,7 @@ pub fn main() !void {
     "...@@WWWWWW@@..." ++
     "...##########..." ++
     "................";
-    try genTexFile(allocator, "assets/banana_editor.qoi", 16, 16, B_EDITOR);
+    try genTexFile(allocator, "assets/objects/bananas/editor.qoi", 16, 16, B_EDITOR);
 
     const B_GAME = 
     "................" ++
@@ -182,5 +182,5 @@ pub fn main() !void {
     "...RRRRRRRRRR..." ++
     "...##########..." ++
     "................";
-    try genTexFile(allocator, "assets/banana_game.qoi", 16, 16, B_GAME);
+    try genTexFile(allocator, "assets/objects/bananas/game.qoi", 16, 16, B_GAME);
 }

@@ -11,6 +11,46 @@ pub const EditorAsset = struct {
     height: i32,
 };
 
+fn scanDir(dir_path: []const u8, loaded_assets: []EditorAsset, loaded_assets_len: *usize, allocator: std.mem.Allocator, sdl_renderer: ?*c.SDL_Renderer) !void {
+    var dir = try std.fs.cwd().openDir(dir_path, .{ .iterate = true });
+    defer dir.close();
+    var iter = dir.iterate();
+    while (try iter.next()) |entry| {
+        var full_path_buf: [1024]u8 = undefined;
+        const full_path = try std.fmt.bufPrint(&full_path_buf, "{s}/{s}", .{dir_path, entry.name});
+        
+        if (entry.kind == .directory) {
+            try scanDir(full_path, loaded_assets, loaded_assets_len, allocator, sdl_renderer);
+        } else if (entry.kind == .file and std.mem.endsWith(u8, entry.name, ".qoi")) {
+            var tex = assets.Texture.load(allocator, full_path) catch continue;
+            defer tex.deinit();
+
+            const sdl_tex = c.SDL_CreateTexture(sdl_renderer, 
+                c.SDL_PIXELFORMAT_RGBA8888, 
+                c.SDL_TEXTUREACCESS_STATIC, 
+                @intCast(tex.width), @intCast(tex.height));
+            
+            _ = c.SDL_SetTextureBlendMode(sdl_tex, c.SDL_BLENDMODE_BLEND);
+            _ = c.SDL_UpdateTexture(sdl_tex, null, tex.pixels.ptr, @intCast(tex.width * @sizeOf(u32)));
+            
+            var new_asset = EditorAsset{
+                .name = undefined,
+                .name_len = entry.name.len,
+                .sdl_texture = sdl_tex.?,
+                .width = @intCast(tex.width),
+                .height = @intCast(tex.height),
+            };
+            @memcpy(new_asset.name[0..entry.name.len], entry.name);
+            
+            if (loaded_assets_len.* < 1024) {
+                loaded_assets[loaded_assets_len.*] = new_asset;
+                loaded_assets_len.* += 1;
+                std.debug.print("Asset Indexed: {s} ({}x{})\n", .{entry.name, tex.width, tex.height});
+            }
+        }
+    }
+}
+
 pub fn main() !void {
     std.debug.print("Initializing The Last Coffee Break at D.O.O.M. Content Editor...\n", .{});
     
@@ -46,44 +86,7 @@ pub fn main() !void {
         }
     }
 
-    var dir = std.fs.cwd().openDir("assets", .{ .iterate = true }) catch null;
-    if (dir != null) {
-        var iter = dir.?.iterate();
-        while (try iter.next()) |entry| {
-            if (entry.kind == .file and std.mem.endsWith(u8, entry.name, ".qoi")) {
-                var path_buf: [1024]u8 = undefined;
-                const path = try std.fmt.bufPrint(&path_buf, "assets/{s}", .{entry.name});
-                
-                var tex = assets.Texture.load(allocator, path) catch continue;
-                defer tex.deinit(); // Free QOI uncompressed bytes after uploading them to actual GPU
-
-                const sdl_tex = c.SDL_CreateTexture(sdl_renderer, 
-                    c.SDL_PIXELFORMAT_RGBA8888, 
-                    c.SDL_TEXTUREACCESS_STATIC, 
-                    @intCast(tex.width), @intCast(tex.height));
-                
-                // Allow our .qoi pixels marked as 'blank=0x00000000' to be fully transparent on top of the black blocks
-                _ = c.SDL_SetTextureBlendMode(sdl_tex, c.SDL_BLENDMODE_BLEND);
-
-                _ = c.SDL_UpdateTexture(sdl_tex, null, tex.pixels.ptr, @intCast(tex.width * @sizeOf(u32)));
-                var new_asset = EditorAsset{
-                    .name = undefined,
-                    .name_len = entry.name.len,
-                    .sdl_texture = sdl_tex.?,
-                    .width = @intCast(tex.width),
-                    .height = @intCast(tex.height),
-                };
-                @memcpy(new_asset.name[0..entry.name.len], entry.name);
-                
-                if (loaded_assets_len < 1024) {
-                    loaded_assets[loaded_assets_len] = new_asset;
-                    loaded_assets_len += 1;
-                    std.debug.print("Asset Indexed: {s} ({}x{})\n", .{entry.name, tex.width, tex.height});
-                }
-            }
-        }
-        dir.?.close();
-    }
+    try scanDir("assets", &loaded_assets, &loaded_assets_len, allocator, sdl_renderer);
 
     var quit: bool = false;
     var event: c.SDL_Event = undefined;

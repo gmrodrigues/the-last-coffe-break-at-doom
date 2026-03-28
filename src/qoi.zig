@@ -126,3 +126,25 @@ pub fn encode(allocator: std.mem.Allocator, width: u32, height: u32, pixels: []c
     @memcpy(out[p..p+8], &[_]u8{0,0,0,0,0,0,0,1});
     return out;
 }
+
+test "QOI Encode/Decode Roundtrip" {
+    const allocator = std.testing.allocator;
+    const width = 2;
+    const height = 2;
+    const pixels = [_]u32{
+        0xFF0000FF, 0x00FF00FF,
+        0x0000FFFF, 0xFFFFFFFF,
+    };
+
+    const encoded = try encode(allocator, width, height, &pixels);
+    defer allocator.free(encoded);
+
+    const decoded = try decode(allocator, encoded);
+    defer decoded.deinit();
+
+    try std.testing.expectEqual(width, decoded.width);
+    try std.testing.expectEqual(height, decoded.height);
+    for (pixels, 0..) |px, i| {
+        try std.testing.expectEqual(px, decoded.pixels[i]);
+    }
+}

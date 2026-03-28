@@ -33,6 +33,43 @@ pub const PossessionStatus = struct {
     }
 };
 
+pub const InteractionType = enum {
+    Exorcise,
+    Push,
+    Pull,
+    Reboot,
+    GlitchHunt,
+};
+
+pub const Action = struct {
+    label: []const u8,
+    type: InteractionType,
+    possible: bool = true,
+};
+
+pub const GameObject = struct {
+    id: u32,
+    x: f32,
+    y: f32,
+    radius: f32 = 0.3,
+    weight: f32 = 1.0, // 1.0 is neutral, >1.0 is heavy
+    state: EntityState = .normal,
+    
+    // FSM
+    fsm_state: u8 = 0,
+    fsm_timer: f32 = 0.0,
+    
+    // Inventory
+    contains_item: bool = false,
+    item_type: []const u8 = "None",
+    
+    pub fn getContextActions(self: *@This()) []const Action {
+        _ = self;
+        // Logic to return available actions based on fsm_state
+        return &[_]Action{}; 
+    }
+};
+
 pub const Gremlin = struct {
     health: f32 = 100.0,
     state: EntityState = .glitched,
