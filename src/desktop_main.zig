@@ -94,15 +94,13 @@ pub const DesktopManager = struct {
     }
     
     fn addTool(self: *DesktopManager, name: []const u8, path: []const u8, icon_path: []const u8) !void {
-        const file = try std.fs.cwd().readFileAlloc(self.allocator, icon_path, 1024 * 1024);
-        defer self.allocator.free(file);
-        
-        const image = try qoi.decode(self.allocator, file);
+        const proxy = @import("asset_proxy.zig").AssetProxy{ .allocator = self.allocator };
+        const image = try proxy.loadOrConvert(icon_path);
         defer image.deinit();
         
         const texture = c.SDL_CreateTexture(
             self.renderer,
-            c.SDL_PIXELFORMAT_ABGR8888,
+            c.SDL_PIXELFORMAT_RGBA8888, // Switched back for high fidelity with 0xRRGGBBAA
             c.SDL_TEXTUREACCESS_STATIC,
             @intCast(image.width),
             @intCast(image.height)
@@ -145,12 +143,12 @@ pub const DesktopManager = struct {
                 const start_y = self.pm_y + 40;
                 
                 for (self.icons.items, 0..) |icon, i| {
-                    const col: i32 = @intCast(i % 5);
-                    const row: i32 = @intCast(i / 5);
-                    const icon_x = start_x + col * 100;
-                    const icon_y = start_y + row * 100;
+                    const col: i32 = @intCast(i % 4); // Adjusted for larger icons
+                    const row: i32 = @intCast(i / 4);
+                    const icon_x = start_x + col * 120;
+                    const icon_y = start_y + row * 120;
                     
-                    if (mx >= icon_x and mx <= icon_x + 64 and my >= icon_y and my <= icon_y + 64) {
+                    if (mx >= icon_x and mx <= icon_x + 96 and my >= icon_y and my <= icon_y + 96) {
                         self.selected_index = i;
                         if (event.button.clicks == 2) {
                             std.debug.print("Launching: {s}\n", .{icon.exec_path});
@@ -197,23 +195,23 @@ pub const DesktopManager = struct {
             const start_y = self.pm_y + 40;
             
             for (self.icons.items, 0..) |icon, i| {
-                const col: i32 = @intCast(i % 5);
-                const row: i32 = @intCast(i / 5);
-                const icon_x = start_x + col * 100;
-                const icon_y = start_y + row * 100;
+                const col: i32 = @intCast(i % 4);
+                const row: i32 = @intCast(i / 4);
+                const icon_x = start_x + col * 120;
+                const icon_y = start_y + row * 120;
                 
-                const dst = c.SDL_Rect{ .x = icon_x + 16, .y = icon_y, .w = 32, .h = 32 };
+                const dst = c.SDL_Rect{ .x = icon_x, .y = icon_y, .w = 96, .h = 96 };
                 _ = c.SDL_RenderCopy(r, icon.texture, null, &dst);
                 
                 if (self.selected_index == i) {
                     _ = c.SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
-                    const border = c.SDL_Rect{ .x = icon_x, .y = icon_y - 4, .w = 64, .h = 64 };
+                    const border = c.SDL_Rect{ .x = icon_x - 4, .y = icon_y - 4, .w = 104, .h = 104 };
                     _ = c.SDL_RenderDrawRect(r, &border);
                 }
                 
                 // Label (Black placeholder for text)
                 _ = c.SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
-                const label_r = c.SDL_Rect{ .x = icon_x, .y = icon_y + 35, .w = 64, .h = 10 };
+                const label_r = c.SDL_Rect{ .x = icon_x, .y = icon_y + 100, .w = 96, .h = 12 };
                 _ = c.SDL_RenderFillRect(r, &label_r);
             }
         }
