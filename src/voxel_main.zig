@@ -1,5 +1,6 @@
 const std = @import("std");
 const qoi = @import("qoi.zig");
+const font = @import("font.zig");
 const c = @cImport({ @cInclude("SDL2/SDL.h"); });
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -388,18 +389,24 @@ pub fn main() !void {
         // Grid toggle
         const g_r = c.SDL_Rect{ .x = 8, .y = 6, .w = 60, .h = 24 };
         if (button(rnd, g_r, if (show_grid) 0x224488FF else 0x222222FF, 0x4466AAFF, mx, my, m_click)) show_grid = !show_grid;
-        setColor(rnd, 0xCCCCCCFF); // label placeholder — no TTF, use colored box
+        setColor(rnd, 0xDDDDFFFF);
+        font.drawTextCentered(c, rnd, "GRID", g_r, 1);
         // Plane toggle
         const p_r = c.SDL_Rect{ .x = 76, .y = 6, .w = 60, .h = 24 };
         if (button(rnd, p_r, if (show_plane) 0x006688FF else 0x222222FF, 0x00AACCFF, mx, my, m_click)) show_plane = !show_plane;
+        setColor(rnd, 0xDDFFFFFF);
+        font.drawTextCentered(c, rnd, "PLANE", p_r, 1);
         // Tool buttons
         const tool_colors = [_]u32{0x22AA44FF, 0xAA2244FF, 0x2244AAFF, 0x446688FF, 0x557799FF, 0xAA8822FF};
         const tools_list  = [_]Tool{.Pencil, .Eraser, .Fill, .Line, .Circle, .Select};
+        const tool_labels = [_][]const u8{"PEN", "ERASE", "FILL", "LINE", "CIRC", "SEL"};
         for (tools_list, 0..) |tool, ti| {
             const tr = c.SDL_Rect{ .x = 160 + @as(i32, @intCast(ti)) * 70, .y = 6, .w = 60, .h = 24 };
             const is_active = (active_tool == tool);
             if (button(rnd, tr, if (is_active) tool_colors[ti] else 0x222233FF, tool_colors[ti], mx, my, m_click))
                 active_tool = tool;
+            setColor(rnd, 0xFFFFFFFF);
+            font.drawTextCentered(c, rnd, tool_labels[ti], tr, 1);
         }
         // Palette swatches
         for (1..PALETTE_COUNT) |pi| {
@@ -472,6 +479,7 @@ pub fn main() !void {
 
         // Layer list
         const kind_colors = [_]u32{ 0x3355AAFF, 0xFF4444FF, 0xFFAA00FF, 0x00AA88FF, 0xAA44FFFF, 0x8888FFFF };
+        const kind_labels = [_][]const u8{ "VOX", "OCC", "LIT", "TEX", "GEO", "?" };
         for (0..layer_count) |li| {
             const ry = TOOLBAR_H + 32 + @as(i32, @intCast(li)) * 50;
             const row = c.SDL_Rect{ .x = VIEWPORT_W + 2, .y = ry, .w = SLICE_PANEL_W - 4, .h = 44 };
@@ -481,12 +489,24 @@ pub fn main() !void {
             setColor(rnd, if (is_sel) 0x4488CCFF else 0x2A2A4AFF);
             drawRect(rnd, row);
             // Kind color stripe
-            setColor(rnd, kind_colors[@intFromEnum(layers[li].kind)]);
+            const ki = @intFromEnum(layers[li].kind);
+            setColor(rnd, kind_colors[ki]);
             fillRect(rnd, c.SDL_Rect{ .x = VIEWPORT_W + 3, .y = ry+2, .w = 6, .h = 40 });
+            // Kind label
+            setColor(rnd, kind_colors[ki]);
+            _ = font.drawText(c, rnd, kind_labels[ki], VIEWPORT_W + 12, ry + 8, 1);
+            // Layer number
+            var num_buf: [8]u8 = undefined;
+            const num_str = std.fmt.bufPrint(&num_buf, "L{}", .{li + 1}) catch "L?";
+            setColor(rnd, 0x8888AAFF);
+            _ = font.drawText(c, rnd, num_str, VIEWPORT_W + 12, ry + 22, 1);
             // Visibility dot
             const vis_r = c.SDL_Rect{ .x = VIEWPORT_W + SLICE_PANEL_W - 20, .y = ry + 14, .w = 14, .h = 14 };
             if (button(rnd, vis_r, if (layers[li].visible) 0x00AACCFF else 0x222233FF, 0x44AADDFF, mx, my, m_click))
                 layers[li].visible = !layers[li].visible;
+            setColor(rnd, 0xFFFFFFFF);
+            if (layers[li].visible) font.drawTextCentered(c, rnd, "O", vis_r, 1)
+            else font.drawTextCentered(c, rnd, "-", vis_r, 1);
             // Select layer
             if (m_click and inR(row, mx, my) and !inR(vis_r, mx, my))
                 active_layer_idx = li;
@@ -565,11 +585,19 @@ pub fn main() !void {
         // Axis buttons
         const axis_list  = [_]Axis{.X, .Y, .Z};
         const axis_cols  = [_]u32{0xCC3333FF, 0x33CC33FF, 0x3333CCFF};
+        const axis_labels = [_][]const u8{"X", "Y", "Z"};
         for (axis_list, 0..) |ax, ai| {
             const ar = c.SDL_Rect{ .x = 8 + @as(i32, @intCast(ai)) * 56, .y = SLICER_RECT.y + 14, .w = 48, .h = 28 };
             if (button(rnd, ar, if (active_axis == ax) axis_cols[ai] else 0x1A1A33FF, axis_cols[ai], mx, my, m_click))
                 active_axis = ax;
+            setColor(rnd, 0xFFFFFFFF);
+            font.drawTextCentered(c, rnd, axis_labels[ai], ar, 2);
         }
+        // Layer indicator text
+        var linfo_buf: [16]u8 = undefined;
+        const linfo = std.fmt.bufPrint(&linfo_buf, "LAYER {}/{}", .{ active_layer, GRID - 1 }) catch "L?";
+        setColor(rnd, 0x8899CCFF);
+        _ = font.drawText(c, rnd, linfo, 185, SLICER_RECT.y + 6, 1);
 
         // Layer slider (big one)
         var layer_slider_val = active_layer;
@@ -596,8 +624,11 @@ pub fn main() !void {
             const merged = mergeLayers(layers[0..layer_count], active_axis, active_layer);
             exportSprites(std.heap.page_allocator, &merged) catch {};
         }
-        setColor(rnd, 0x9944FFFF);
-        _ = c.SDL_RenderDrawLine(rnd, WIN_W - 80, SLICER_RECT.y + 28, WIN_W - 25, SLICER_RECT.y + 28);
+        setColor(rnd, 0xFFFFFFFF);
+        font.drawTextCentered(c, rnd, "EXPORT", exp_r, 1);
+        // Opacity label
+        setColor(rnd, 0x6688AAFF);
+        _ = font.drawText(c, rnd, "OPACITY", 765, SLICER_RECT.y + 5, 1);
 
         // ═══════════════════════════════════════════════════════════════════
         // 6. 8-DIRECTION TILES (bottom strip — flat shadowless render)
@@ -633,7 +664,12 @@ pub fn main() !void {
             setColor(rnd, if (ti == @as(usize, @intCast(cam_angle))) 0x00BBFFFF else 0x2A2A4AFF);
             drawRect(rnd, tile_rect);
 
-            // Click to set camera angle or double-use as preview clicker
+            // Angle label below the tile
+            const angle_degs = [_][]const u8{"0","45","90","135","180","225","270","315"};
+            setColor(rnd, if (ti == @as(usize, @intCast(cam_angle))) 0x00BBFFFF else 0x5555AAFF);
+            _ = font.drawText(c, rnd, angle_degs[ti], tx + @divTrunc(TILE_W, 2) - 4, ty + TILE_H + 2, 1);
+
+            // Click to set camera angle
             if (m_click and inR(tile_rect, mx, my)) cam_angle = @intCast(ti);
         }
 
