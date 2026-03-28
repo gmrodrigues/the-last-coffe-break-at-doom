@@ -103,8 +103,9 @@ pub fn main() !void {
     var quit: bool = false;
     var event: c.SDL_Event = undefined;
 
+    _ = c.SDL_SetRelativeMouseMode(c.SDL_TRUE);
+    const mouse_sensitivity: f32 = 0.002;
     const move_speed: f32 = 0.05;
-    const rot_speed: f32 = 0.03;
     var is_firing: bool = false;
     var fire_frames: u32 = 0; // Control animation timer
 
@@ -122,34 +123,54 @@ pub fn main() !void {
                         else => {}
                     }
                 },
+                c.SDL_MOUSEMOTION => {
+                    const xrel = @as(f32, @floatFromInt(event.motion.xrel));
+                    const rot = -xrel * mouse_sensitivity;
+                    
+                    const old_dir_x = camera.dir_x;
+                    camera.dir_x = camera.dir_x * @cos(rot) - camera.dir_y * @sin(rot);
+                    camera.dir_y = old_dir_x * @sin(rot) + camera.dir_y * @cos(rot);
+                    const old_plane_x = camera.plane_x;
+                    camera.plane_x = camera.plane_x * @cos(rot) - camera.plane_y * @sin(rot);
+                    camera.plane_y = old_plane_x * @sin(rot) + camera.plane_y * @cos(rot);
+                },
                 else => {},
             }
         }
 
         const keystates = c.SDL_GetKeyboardState(null);
+        var dx: f32 = 0;
+        var dy: f32 = 0;
+
         if (keystates[c.SDL_SCANCODE_W] != 0) {
-            camera.x += camera.dir_x * move_speed;
-            camera.y += camera.dir_y * move_speed;
+            dx += camera.dir_x * move_speed;
+            dy += camera.dir_y * move_speed;
         }
         if (keystates[c.SDL_SCANCODE_S] != 0) {
-            camera.x -= camera.dir_x * move_speed;
-            camera.y -= camera.dir_y * move_speed;
+            dx -= camera.dir_x * move_speed;
+            dy -= camera.dir_y * move_speed;
         }
         if (keystates[c.SDL_SCANCODE_A] != 0) {
-            const old_dir_x = camera.dir_x;
-            camera.dir_x = camera.dir_x * @cos(rot_speed) - camera.dir_y * @sin(rot_speed);
-            camera.dir_y = old_dir_x * @sin(rot_speed) + camera.dir_y * @cos(rot_speed);
-            const old_plane_x = camera.plane_x;
-            camera.plane_x = camera.plane_x * @cos(rot_speed) - camera.plane_y * @sin(rot_speed);
-            camera.plane_y = old_plane_x * @sin(rot_speed) + camera.plane_y * @cos(rot_speed);
+            dx -= camera.plane_x * move_speed;
+            dy -= camera.plane_y * move_speed;
         }
         if (keystates[c.SDL_SCANCODE_D] != 0) {
-            const old_dir_x = camera.dir_x;
-            camera.dir_x = camera.dir_x * @cos(-rot_speed) - camera.dir_y * @sin(-rot_speed);
-            camera.dir_y = old_dir_x * @sin(-rot_speed) + camera.dir_y * @cos(-rot_speed);
-            const old_plane_x = camera.plane_x;
-            camera.plane_x = camera.plane_x * @cos(-rot_speed) - camera.plane_y * @sin(-rot_speed);
-            camera.plane_y = old_plane_x * @sin(-rot_speed) + camera.plane_y * @cos(-rot_speed);
+            dx += camera.plane_x * move_speed;
+            dy += camera.plane_y * move_speed;
+        }
+
+        // Apply Sliding Collision
+        const buffer: f32 = 0.2;
+        const sign_x: f32 = if (dx > 0) 1 else -1;
+        const sign_y: f32 = if (dy > 0) 1 else -1;
+        
+        // Check X movement
+        if (map.get(@intFromFloat(camera.x + dx + sign_x * buffer), @intFromFloat(camera.y)) == 0) {
+            camera.x += dx;
+        }
+        // Check Y movement
+        if (map.get(@intFromFloat(camera.x), @intFromFloat(camera.y + dy + sign_y * buffer)) == 0) {
+            camera.y += dy;
         }
 
         // Firing logic / animation cooldown

@@ -7,7 +7,9 @@
 - [x] **RRA-007**: Backlog System Formalization
 - [x] **RRA-015**: Grid-based Desktop Icon Layout
 - [x] **RRA-016**: Dynamic Tool Metadata (YAML Integration)
-- [/] **RRA-017**: Automatic PNG-to-QOI Conversion & Caching (In Progress)
+- [x] **RRA-017**: Automatic PNG-to-QOI Conversion & Caching
+- [x] **RRA-018**: Modern FPS Movement (WASD + Mouse)
+- [x] **RRA-019**: Physical Collision System (AABB Sliding)
 
 ## ⏳ Next Steps (Sprint 2)
 - [ ] **RRA-008**: Window dragging/minimizing for DOOM_OS_311
