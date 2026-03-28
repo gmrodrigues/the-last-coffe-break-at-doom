@@ -1,0 +1,18 @@
+# DOOM Vibe Color Palette Constraints
+
+# Standard Corporate Colors
+CorporateGreyscale:
+  - dark: 0x111111 # Deep Shadows
+  - mid: 0x333333  # Concrete/Metal
+  - light: 0xAAAAAA # Office Walls
+  - highlights: 0xFFFFFF # Fluorescent Lights
+
+# Satirical Highlight Colors
+CorporateBlue: 0x0000FF   # Outlook Notification Blue
+DoomRed: 0xFF1111        # Exit Sign/Blood
+ErrorYellow: 0xFFFF00    # Warning/Cringe
+InnocenceGreen: 0x00FF00 # Safe/Healthy
+
+# Rendering Tips:
+# Use these colors in your mockups and asset generation tools to ensure 
+# they match the existing `mkqoi.zig` PALETTE.

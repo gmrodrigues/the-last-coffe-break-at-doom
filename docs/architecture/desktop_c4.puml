@@ -1,0 +1,19 @@
+@startuml
+!include <C4/C4_Container>
+
+LAYOUT_WITH_LEGEND()
+
+Person(slayer, "The Slayer", "Tired 42-year-old corporate worker.")
+System_Boundary(doom_os, "DOOM_OS_311 Desktop") {
+    Container(desktop, "Desktop Sim", "Zig/SDL", "Simulates Windows 3.11 environment.")
+    Container(program_manager, "Program Manager", "Zig", "Lists and launches metadata-driven tools.")
+}
+
+System_Ext(voxel_forge, "Voxel Forge V3", "3D CAD Tool")
+System_Ext(gaslight_edit, "Gaslight Editor", "ZUI Dialogue Tool")
+
+Rel(slayer, desktop, "Double-clicks icons")
+Rel(desktop, program_manager, "Invokes tool")
+Rel(program_manager, voxel_forge, "Spawns process")
+Rel(program_manager, gaslight_edit, "Spawns process")
+@enduml

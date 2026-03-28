@@ -52,6 +52,8 @@ const LayerKind = enum { Voxel, Occlusion, Illumination, Texture, Geometry };
 const Layer = struct {
     kind:    LayerKind = .Voxel,
     visible: bool = true,
+    axis:    Axis = .Z,
+    slice:   i32 = GRID / 2,
     data:    [GRID][GRID]u8 = [_][GRID]u8{[_]u8{0} ** GRID} ** GRID,
 };
 
@@ -120,17 +122,21 @@ const RVoxel = struct { sx: i32, sy: i32, depth: f32, rgba: u32, ghost: bool };
 fn projectGrid(
     buf: []RVoxel,
     grid: *const [GRID][GRID][GRID]u8,
-    cam: u32,
-    active_axis: Axis,
-    active_layer: i32,
+    yaw: f32,
+    pitch: f32,
+    zoom: f32,
+    pan_x: f32,
+    pan_y: f32,
+    active_layer: *const Layer,
     origin_x: i32,
     origin_y: i32,
-    flat: bool,   // if true: no ghost, no plane — pure albedo for tiles
+    flat: bool,
 ) usize {
     var len: usize = 0;
-    const angle_rad = @as(f32, @floatFromInt(cam)) * std.math.pi / 4.0;
-    const cos_a = @cos(angle_rad);
-    const sin_a = @sin(angle_rad);
+    const cos_y = @cos(yaw);
+    const sin_y = @sin(yaw);
+    const cos_p = @cos(pitch);
+    const sin_p = @sin(pitch);
 
     for (0..GRID) |zi| {
         for (0..GRID) |yi| {
@@ -140,22 +146,31 @@ fn projectGrid(
 
                 const cx = @as(f32, @floatFromInt(xi)) - GRID / 2.0;
                 const cy = @as(f32, @floatFromInt(yi)) - GRID / 2.0;
-                const nx = cx * cos_a - cy * sin_a;
-                const ny = cx * sin_a + cy * cos_a;
-                const sx = origin_x + @as(i32, @intFromFloat(nx * 4.0));
-                const sy = origin_y + @as(i32, @intFromFloat(ny * 2.2)) - @as(i32, @intFromFloat(@as(f32, @floatFromInt(zi)) * 4.0));
-                const depth = ny * 10.0 - @as(f32, @floatFromInt(zi));
+                const cz = @as(f32, @floatFromInt(zi)) - GRID / 2.0;
+
+                // Orbit rotation (Yaw then Pitch)
+                const x1 = cx * cos_y - cy * sin_y;
+                const y1 = cx * sin_y + cy * cos_y;
+                const z1 = cz;
+
+                const x2 = x1;
+                const y2 = y1 * cos_p - z1 * sin_p;
+                const z2 = y1 * sin_p + z1 * cos_p;
+
+                const sx = origin_x + @as(i32, @intFromFloat(pan_x + x2 * zoom * 4.0));
+                const sy = origin_y + @as(i32, @intFromFloat(pan_y + y2 * zoom * 2.2 - z2 * zoom * 4.0));
+                const depth = y2 * 10.0 - z2;
 
                 var rgba = PALETTE[color_idx];
                 var ghost = false;
 
                 if (!flat) {
-                    const layer_coord: i32 = switch (active_axis) {
+                    const layer_coord: i32 = switch (active_layer.axis) {
                         .Z => @as(i32, @intCast(zi)),
                         .Y => @as(i32, @intCast(yi)),
                         .X => @as(i32, @intCast(xi)),
                     };
-                    if (layer_coord > active_layer) {
+                    if (layer_coord > active_layer.slice) {
                         ghost = true;
                         rgba = (rgba & 0xFFFFFF00) | 0x40; // very transparent
                     }
@@ -190,32 +205,67 @@ fn splat(rnd: *c.SDL_Renderer, vx: RVoxel) void {
 }
 
 /// Draw translucent Glowing Plane inside the 3D viewport
-fn drawGlowingPlane(rnd: *c.SDL_Renderer, cam: u32, active_axis: Axis, active_layer: i32,
-                    origin_x: i32, origin_y: i32, plane_opacity: u8) void {
+fn drawGlowingPlane(rnd: *c.SDL_Renderer, yaw: f32, pitch: f32, zoom: f32, pan_x: f32, pan_y: f32,
+                    layer: *const Layer, origin_x: i32, origin_y: i32, plane_opacity: u8) void {
     _ = c.SDL_SetRenderDrawBlendMode(rnd, c.SDL_BLENDMODE_BLEND);
     _ = c.SDL_SetRenderDrawColor(rnd, 0, 200, 255, plane_opacity);
-    const angle_rad = @as(f32, @floatFromInt(cam)) * std.math.pi / 4.0;
-    const cos_a = @cos(angle_rad);
-    const sin_a = @sin(angle_rad);
-    const lf = @as(f32, @floatFromInt(active_layer)) - GRID / 2.0;
+    const cos_y = @cos(yaw);
+    const sin_y = @sin(yaw);
+    const cos_p = @cos(pitch);
+    const sin_p = @sin(pitch);
+    const lf = @as(f32, @floatFromInt(layer.slice)) - GRID / 2.0;
 
     for (0..GRID) |a| {
         for (0..GRID) |b| {
             var cx: f32 = undefined; var cy: f32 = undefined; var cz: f32 = undefined;
-            switch (active_axis) {
+            switch (layer.axis) {
                 .Z => { cx = @as(f32, @floatFromInt(a)) - GRID/2.0; cy = @as(f32, @floatFromInt(b)) - GRID/2.0; cz = lf; },
-                .Y => { cx = @as(f32, @floatFromInt(a)) - GRID/2.0; cy = lf; cz = @as(f32, @floatFromInt(b)); },
-                .X => { cx = lf; cy = @as(f32, @floatFromInt(a)) - GRID/2.0; cz = @as(f32, @floatFromInt(b)); },
+                .Y => { cx = @as(f32, @floatFromInt(a)) - GRID/2.0; cy = lf; cz = @as(f32, @floatFromInt(b)) - GRID/2.0; },
+                .X => { cx = lf; cy = @as(f32, @floatFromInt(a)) - GRID/2.0; cz = @as(f32, @floatFromInt(b)) - GRID/2.0; },
             }
-            const nx = cx * cos_a - cy * sin_a;
-            const ny = cx * sin_a + cy * cos_a;
-            const sx = origin_x + @as(i32, @intFromFloat(nx * 4.0));
-            const sy = origin_y + @as(i32, @intFromFloat(ny * 2.2)) - @as(i32, @intFromFloat(cz * 4.0));
+            const x1 = cx * cos_y - cy * sin_y;
+            const y1 = cx * sin_y + cy * cos_y;
+            const z1 = cz;
+            const x2 = x1;
+            const y2 = y1 * cos_p - z1 * sin_p;
+            const z2 = y1 * sin_p + z1 * cos_p;
+
+            const sx = origin_x + @as(i32, @intFromFloat(pan_x + x2 * zoom * 4.0));
+            const sy = origin_y + @as(i32, @intFromFloat(pan_y + y2 * zoom * 2.2 - z2 * zoom * 4.0));
             const cell = c.SDL_Rect{ .x = sx - 2, .y = sy - 2, .w = 4, .h = 4 };
             _ = c.SDL_RenderFillRect(rnd, &cell);
         }
     }
     _ = c.SDL_SetRenderDrawBlendMode(rnd, c.SDL_BLENDMODE_NONE);
+}
+
+fn drawCompass(rnd: *c.SDL_Renderer, yaw: f32, pitch: f32, ox: i32, oy: i32) void {
+    const cos_y = @cos(yaw);
+    const sin_y = @sin(yaw);
+    const cos_p = @cos(pitch);
+    const sin_p = @sin(pitch);
+    const size: f32 = 25.0;
+
+    const AxisInfo = struct { dx: f32, dy: f32, dz: f32, color: u32 };
+    const axes = [_]AxisInfo{
+        .{ .dx = 1, .dy = 0, .dz = 0, .color = 0xCC3333FF }, // X
+        .{ .dx = 0, .dy = 1, .dz = 0, .color = 0x33CC33FF }, // Y
+        .{ .dx = 0, .dy = 0, .dz = 1, .color = 0x3333CCFF }, // Z
+    };
+
+    for (axes) |a| {
+        const x1 = a.dx * cos_y - a.dy * sin_y;
+        const y1 = a.dx * sin_y + a.dy * cos_y;
+        const z1 = a.dz;
+        const x2 = x1;
+        const y2 = y1 * cos_p - z1 * sin_p;
+        const z2 = y1 * sin_p + z1 * cos_p;
+
+        const tx = ox + @as(i32, @intFromFloat(x2 * size));
+        const ty = oy + @as(i32, @intFromFloat(y2 * size * 0.6 - z2 * size));
+        setColor(rnd, a.color);
+        _ = c.SDL_RenderDrawLine(rnd, ox, oy, tx, ty);
+    }
 }
 
 // ─── CAD Tool Algorithms ──────────────────────────────────────────────────────
@@ -261,7 +311,7 @@ fn drawBresenhamCircle(data: *[GRID][GRID]u8, xc: i32, yc: i32, r0: i32, color: 
 }
 
 // ─── Merge layers → master grid ───────────────────────────────────────────────
-fn mergeLayers(layers: []const Layer, active_axis: Axis, active_layer: i32) [GRID][GRID][GRID]u8 {
+fn mergeLayers(layers: []const Layer) [GRID][GRID][GRID]u8 {
     var grid: [GRID][GRID][GRID]u8 = undefined;
     @memset(&grid, [_][GRID]u8{[_]u8{0} ** GRID} ** GRID);
 
@@ -272,10 +322,10 @@ fn mergeLayers(layers: []const Layer, active_axis: Axis, active_layer: i32) [GRI
             for (0..GRID) |col| {
                 const v = layer.data[r][col];
                 if (v == 0) continue;
-                switch (active_axis) {
-                    .Z => grid[@intCast(active_layer)][r][col] = v,
-                    .Y => grid[r][@intCast(active_layer)][col] = v,
-                    .X => grid[r][col][@intCast(active_layer)] = v,
+                switch (layer.axis) {
+                    .Z => grid[@intCast(layer.slice)][@intCast(r)][@intCast(col)] = v,
+                    .Y => grid[@intCast(r)][@intCast(layer.slice)][@intCast(col)] = v,
+                    .X => grid[@intCast(r)][@intCast(col)][@intCast(layer.slice)] = v,
                 }
             }
         }
@@ -298,7 +348,9 @@ fn exportSprites(allocator: std.mem.Allocator, grid: *const [GRID][GRID][GRID]u8
         frames_indices[a] = indices;
 
         var rvox: [GRID * GRID * GRID + 1]RVoxel = undefined;
-        const n = projectGrid(&rvox, grid, @intCast(a), .Z, 0,
+        var dummy_layer = Layer{};
+        const ayaw = @as(f32, @floatFromInt(a)) * std.math.pi / 4.0;
+        const n = projectGrid(&rvox, grid, ayaw, 0.615, 4.0, 0, 0, &dummy_layer,
                               TILE_W / 2, TILE_H / 2 + 10, true);
         
         // Rasterize into both RGBA (for QOI) and Indices (for GIF)
@@ -362,13 +414,19 @@ pub fn main() !void {
     const MAX_LAYERS = 8;
     var layers: [MAX_LAYERS]Layer = undefined;
     for (&layers) |*l| l.* = Layer{};
-    layers[0] = .{ .kind = .Voxel, .visible = true };
+    layers[0] = .{ .kind = .Voxel, .visible = true, .axis = .Z, .slice = GRID / 2 };
     var layer_count: usize = 1;
-    var active_layer_idx: usize = 0;  // which layer in the stack we edit
-    var active_axis: Axis = .Z;
-    var active_layer: i32 = GRID / 2; // slice position
+    var active_layer_idx: usize = 0;
     var plane_opacity: i32 = 120;
-    var cam_angle: i32 = 1;           // 0..7
+    
+    // Camera
+    var cam_yaw: f32 = 0.785; // 45 deg
+    var cam_pitch: f32 = 0.615; // iso
+    var cam_zoom: f32 = 4.0;
+    var cam_pan_x: f32 = 0.0;
+    var cam_pan_y: f32 = 0.0;
+    var last_click_time: u32 = 0;
+
     var active_color: u8 = 1;
     var active_tool: Tool = .Pencil;
     var show_grid: bool = true;
@@ -378,11 +436,11 @@ pub fn main() !void {
     var drag_start_x: i32 = -1;
     var drag_start_y: i32 = -1;
     var m_down = false;
+    var m_r_down = false;
     var m_click = false;
     var m_up = false;
 
     var frame_tick: u32 = 0;
-
     var event: c.SDL_Event = undefined;
 
     while (true) {
@@ -393,11 +451,37 @@ pub fn main() !void {
                 c.SDL_KEYDOWN => switch (event.key.keysym.sym) {
                     c.SDLK_ESCAPE => return,
                     c.SDLK_p => exportSprites(std.heap.page_allocator,
-                                              &mergeLayers(layers[0..layer_count], active_axis, active_layer)) catch {},
+                                              &mergeLayers(layers[0..layer_count])) catch {},
                     else => {},
                 },
-                c.SDL_MOUSEBUTTONDOWN => if (event.button.button == c.SDL_BUTTON_LEFT) { m_down = true; m_click = true; },
-                c.SDL_MOUSEBUTTONUP   => if (event.button.button == c.SDL_BUTTON_LEFT) { m_down = false; m_up = true; },
+                c.SDL_MOUSEBUTTONDOWN => {
+                    const now = c.SDL_GetTicks();
+                    if (event.button.button == c.SDL_BUTTON_LEFT) {
+                        m_down = true; m_click = true;
+                        if (now - last_click_time < 300 and inR(VIEWPORT_RECT, event.button.x, event.button.y)) {
+                            cam_yaw = 0.785; cam_pitch = 0.615; cam_zoom = 4.0; cam_pan_x = 0; cam_pan_y = 0;
+                        }
+                        last_click_time = now;
+                    }
+                    if (event.button.button == c.SDL_BUTTON_RIGHT) m_r_down = true;
+                },
+                c.SDL_MOUSEBUTTONUP => {
+                    if (event.button.button == c.SDL_BUTTON_LEFT) { m_down = false; m_up = true; }
+                    if (event.button.button == c.SDL_BUTTON_RIGHT) m_r_down = false;
+                },
+                c.SDL_MOUSEWHEEL => {
+                    if (event.wheel.y > 0) cam_zoom *= 1.1 else cam_zoom *= 0.9;
+                },
+                c.SDL_MOUSEMOTION => {
+                    if (m_down and inR(VIEWPORT_RECT, event.motion.x, event.motion.y)) {
+                        cam_yaw += @as(f32, @floatFromInt(event.motion.xrel)) * 0.01;
+                        cam_pitch += @as(f32, @floatFromInt(event.motion.yrel)) * 0.01;
+                    }
+                    if (m_r_down and inR(VIEWPORT_RECT, event.motion.x, event.motion.y)) {
+                        cam_pan_x += @as(f32, @floatFromInt(event.motion.xrel));
+                        cam_pan_y += @as(f32, @floatFromInt(event.motion.yrel));
+                    }
+                },
                 else => {},
             }
         }
@@ -406,11 +490,11 @@ pub fn main() !void {
 
         frame_tick += 1;
         if (play_anim and frame_tick % 12 == 0) {
-            active_layer = @mod(active_layer + 1, GRID);
+            layers[active_layer_idx].slice = @mod(layers[active_layer_idx].slice + 1, GRID);
         }
 
         // ── Build merged grid ────────────────────────────────────────────────
-        const grid = mergeLayers(layers[0..layer_count], active_axis, active_layer);
+        const grid = mergeLayers(layers[0..layer_count]);
         var rvox_buf: [GRID * GRID * GRID + 1]RVoxel = undefined;
 
         // ── Clear ────────────────────────────────────────────────────────────
@@ -467,28 +551,54 @@ pub fn main() !void {
         const vox_origin_y = VIEWPORT_RECT.y + @divTrunc(VIEWPORT_RECT.h * 55, 100);
 
         // Draw voxels
-        const vn = projectGrid(&rvox_buf, &grid, @intCast(cam_angle),
-                               active_axis, active_layer,
+        const vn = projectGrid(&rvox_buf, &grid, cam_yaw, cam_pitch, cam_zoom, cam_pan_x, cam_pan_y,
+                               &layers[active_layer_idx],
                                vox_origin_x, vox_origin_y, false);
         for (rvox_buf[0..vn]) |v| splat(rnd, v);
 
         // Glowing Plane
-        if (show_plane) drawGlowingPlane(rnd, @intCast(cam_angle), active_axis, active_layer,
+        if (show_plane) drawGlowingPlane(rnd, cam_yaw, cam_pitch, cam_zoom, cam_pan_x, cam_pan_y,
+                                         &layers[active_layer_idx],
                                          vox_origin_x, vox_origin_y, @intCast(plane_opacity));
+        
+        // Compass
+        drawCompass(rnd, cam_yaw, cam_pitch, VIEWPORT_RECT.x + 40, VIEWPORT_RECT.y + VIEWPORT_RECT.h - 40);
 
         // Grid floor
         if (show_grid) {
             _ = c.SDL_SetRenderDrawBlendMode(rnd, c.SDL_BLENDMODE_BLEND);
             _ = c.SDL_SetRenderDrawColor(rnd, 60, 60, 100, 50);
-            const gn = 6;
-            for (0..gn) |gi| {
-                const t: f32 = @as(f32, @floatFromInt(gi)) - gn / 2.0;
-                const a_rad = @as(f32, @floatFromInt(cam_angle)) * std.math.pi / 4.0;
-                const px1 = vox_origin_x + @as(i32, @intFromFloat((t * @cos(a_rad) - (-4) * @sin(a_rad)) * 4.0));
-                const py1 = vox_origin_y + @as(i32, @intFromFloat((t * @sin(a_rad) + (-4) * @cos(a_rad)) * 2.2)) + 40;
-                const px2 = vox_origin_x + @as(i32, @intFromFloat((t * @cos(a_rad) - (4) * @sin(a_rad)) * 4.0));
-                const py2 = vox_origin_y + @as(i32, @intFromFloat((t * @sin(a_rad) + (4) * @cos(a_rad)) * 2.2)) + 40;
-                _ = c.SDL_RenderDrawLine(rnd, px1, py1, px2, py2);
+            const gn = 8;
+            const cos_y = @cos(cam_yaw);
+            const sin_y = @sin(cam_yaw);
+            const cos_p = @cos(cam_pitch);
+            const sin_p = @sin(cam_pitch);
+            const cz: f32 = 0.0 - GRID / 2.0;
+
+            for (0..gn+1) |gi| {
+                const t: f32 = (@as(f32, @floatFromInt(gi)) / @as(f32, @floatFromInt(gn)) - 0.5) * GRID * 1.2;
+                for (0..2) |dir| {
+                    const lstart: f32 = -GRID * 0.6;
+                    const lend: f32 = GRID * 0.6;
+                    
+                    const p1x = if (dir == 0) t else lstart;
+                    const p1y = if (dir == 0) lstart else t;
+                    const p2x = if (dir == 0) t else lend;
+                    const p2y = if (dir == 0) lend else t;
+
+                    const pts = [_][2]f32{ .{p1x, p1y}, .{p2x, p2y} };
+                    var spts: [2][2]i32 = undefined;
+                    for (0..2) |pi| {
+                        const x1 = pts[pi][0] * cos_y - pts[pi][1] * sin_y;
+                        const y1 = pts[pi][0] * sin_y + pts[pi][1] * cos_y;
+                        const x2 = x1;
+                        const y2 = y1 * cos_p - cz * sin_p;
+                        const z2 = y1 * sin_p + cz * cos_p;
+                        spts[pi][0] = vox_origin_x + @as(i32, @intFromFloat(cam_pan_x + x2 * cam_zoom * 4.0));
+                        spts[pi][1] = vox_origin_y + @as(i32, @intFromFloat(cam_pan_y + y2 * cam_zoom * 2.2 - z2 * cam_zoom * 4.0));
+                    }
+                    _ = c.SDL_RenderDrawLine(rnd, spts[0][0], spts[0][1], spts[1][0], spts[1][1]);
+                }
             }
             _ = c.SDL_SetRenderDrawBlendMode(rnd, c.SDL_BLENDMODE_NONE);
         }
@@ -504,7 +614,7 @@ pub fn main() !void {
         // Add layer button (+)
         const add_r = c.SDL_Rect{ .x = VIEWPORT_W + 4, .y = TOOLBAR_H + 4, .w = SLICE_PANEL_W - 8, .h = 22 };
         if (layer_count < MAX_LAYERS and button(rnd, add_r, 0x1A3A1AFF, 0x22AA44FF, mx, my, m_click)) {
-            layers[layer_count] = .{ .kind = .Voxel, .visible = true };
+            layers[layer_count] = .{ .kind = .Voxel, .visible = true, .axis = .Z, .slice = GRID / 2 };
             layer_count += 1;
         }
         setColor(rnd, 0x22AA44FF);
@@ -624,21 +734,22 @@ pub fn main() !void {
         const axis_labels = [_][]const u8{"X", "Y", "Z"};
         for (axis_list, 0..) |ax, ai| {
             const ar = c.SDL_Rect{ .x = 8 + @as(i32, @intCast(ai)) * 56, .y = SLICER_RECT.y + 14, .w = 48, .h = 28 };
-            if (button(rnd, ar, if (active_axis == ax) axis_cols[ai] else 0x1A1A33FF, axis_cols[ai], mx, my, m_click))
-                active_axis = ax;
+            const is_ax = (layers[active_layer_idx].axis == ax);
+            if (button(rnd, ar, if (is_ax) axis_cols[ai] else 0x1A1A33FF, axis_cols[ai], mx, my, m_click))
+                layers[active_layer_idx].axis = ax;
             setColor(rnd, 0xFFFFFFFF);
             font.drawTextCentered(c, rnd, axis_labels[ai], ar, 2);
         }
         // Layer indicator text
-        var linfo_buf: [16]u8 = undefined;
-        const linfo = std.fmt.bufPrint(&linfo_buf, "LAYER {}/{}", .{ active_layer, GRID - 1 }) catch "L?";
+        var linfo_buf: [24]u8 = undefined;
+        const linfo = std.fmt.bufPrint(&linfo_buf, "L{} SLICE {}/{}", .{ active_layer_idx+1, layers[active_layer_idx].slice, GRID - 1 }) catch "L?";
         setColor(rnd, 0x8899CCFF);
         _ = font.drawText(c, rnd, linfo, 185, SLICER_RECT.y + 6, 1);
 
         // Layer slider (big one)
-        var layer_slider_val = active_layer;
+        var layer_slider_val = layers[active_layer_idx].slice;
         slider(rnd, c.SDL_Rect{ .x = 185, .y = SLICER_RECT.y + 18, .w = 500, .h = 20 }, 0, GRID - 1, &layer_slider_val, mx, my, m_down);
-        active_layer = layer_slider_val;
+        layers[active_layer_idx].slice = layer_slider_val;
 
         // Play button
         const play_r = c.SDL_Rect{ .x = 695, .y = SLICER_RECT.y + 14, .w = 40, .h = 28 };
@@ -657,7 +768,7 @@ pub fn main() !void {
         // Export button
         const exp_r = c.SDL_Rect{ .x = WIN_W - 100, .y = SLICER_RECT.y + 12, .w = 90, .h = 32 };
         if (button(rnd, exp_r, 0x331155FF, 0x9944FFFF, mx, my, m_click)) {
-            const merged = mergeLayers(layers[0..layer_count], active_axis, active_layer);
+            const merged = mergeLayers(layers[0..layer_count]);
             exportSprites(std.heap.page_allocator, &merged) catch {};
         }
         setColor(rnd, 0xFFFFFFFF);
@@ -687,7 +798,9 @@ pub fn main() !void {
             // Draw flat mini-render directly (no texture upload for simplicity)
             const ox = tx + TILE_W / 2;
             const oy = ty + TILE_H / 2 + 8;
-            const tn = projectGrid(&rvox_buf, &grid, @intCast(ti), .Z, 0, ox, oy, true);
+            var dummy_layer = Layer{};
+            const ayaw = @as(f32, @floatFromInt(ti)) * std.math.pi / 4.0;
+            const tn = projectGrid(&rvox_buf, &grid, ayaw, 0.615, 4.0, 0, 0, &dummy_layer, ox, oy, true);
             for (rvox_buf[0..tn]) |v| {
                 // Clip to tile
                 if (v.sx < tx or v.sx >= tx + TILE_W or v.sy < ty or v.sy >= ty + TILE_H) continue;
@@ -697,16 +810,21 @@ pub fn main() !void {
             }
 
             // Active cam highlight
-            setColor(rnd, if (ti == @as(usize, @intCast(cam_angle))) 0x00BBFFFF else 0x2A2A4AFF);
+            const closest_ti: usize = @intCast(@mod(@as(i32, @intFromFloat(cam_yaw * 4.0 / std.math.pi + 0.5)), 8));
+            const is_closest = (ti == closest_ti);
+            setColor(rnd, if (is_closest) 0x00BBFFFF else 0x2A2A4AFF);
             drawRect(rnd, tile_rect);
 
             // Angle label below the tile
             const angle_degs = [_][]const u8{"0","45","90","135","180","225","270","315"};
-            setColor(rnd, if (ti == @as(usize, @intCast(cam_angle))) 0x00BBFFFF else 0x5555AAFF);
-            _ = font.drawText(c, rnd, angle_degs[ti], tx + @divTrunc(TILE_W, 2) - 4, ty + TILE_H + 2, 1);
+            setColor(rnd, if (is_closest) 0x00BBFFFF else 0x5555AAFF);
+            _ = font.drawText(c, rnd, angle_degs[ti], tx + @divTrunc(TILE_W, 2) - 10, ty + TILE_H + 2, 1);
 
             // Click to set camera angle
-            if (m_click and inR(tile_rect, mx, my)) cam_angle = @intCast(ti);
+            if (m_click and inR(tile_rect, mx, my)) {
+                cam_yaw = @as(f32, @floatFromInt(ti)) * std.math.pi / 4.0;
+                cam_pitch = 0.615;
+            }
         }
 
         c.SDL_RenderPresent(rnd);

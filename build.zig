@@ -64,6 +64,24 @@ pub fn build(b: *std.Build) void {
     const run_voxel_step = b.step("voxel", "Run the D.O.O.M Voxel Forge");
     run_voxel_step.dependOn(&run_voxel_cmd.step);
 
+    // --- DESKTOP EXECUTABLE ---
+    const desktop_exe = b.addExecutable(.{
+        .name = "tlc_desktop",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/desktop_main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    desktop_exe.linkLibC();
+    desktop_exe.linkSystemLibrary("SDL2");
+    b.installArtifact(desktop_exe);
+
+    const run_desktop_cmd = b.addRunArtifact(desktop_exe);
+    run_desktop_cmd.step.dependOn(b.getInstallStep());
+    const run_desktop_step = b.step("desktop", "Run the D.O.O.M_OS_311 Desktop");
+    run_desktop_step.dependOn(&run_desktop_cmd.step);
+
     // --- TESTS ---
     const exe_unit_tests = b.addTest(.{
         .root_module = b.createModule(.{

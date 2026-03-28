@@ -5,21 +5,26 @@ Baseado no layout conceitual gerado na V3 (visual batizado como "VOXELSCRIPT 3.2
 ![Conceito da Interface Voxel V3](voxel_editor_concept.png)
 
 ## 1. 3D Viewport (Painel Esquerdo - Superior)
-- **Função:** Visualizador Isométrico (ou Perspectiva) do modelo tridimensional.
-- **Barra de Câmera Topo:** Uma fileira de botões rápidos para translação e iluminação: `Orbit` (rotacionar estátua), `Pan` (mover na viewport), `Zoom` (distância orbital) e `Light` (fonte local).
+- **Função:** Visualizador Interativo da geometria.
+- **Controles de Mouse (Navegação Espacial):**
+    - **Orbit (Botão Esquerdo):** Clicar e arrastar rotaciona a câmera livremente em torno do centro do modelo (Yaw/Pitch).
+    - **Pan (Botão Direito):** Clicar e arrastar move o ponto de vista lateralmente ou verticalmente.
+    - **Zoom (Scroll):** A roda do mouse aproxima ou afasta a câmera (Escala).
+    - **Reset (Duplo Clique):** Retorna a câmera para a posição isométrica neutra (45°, Zoom 1.0).
+- **Bússola 3D (Gizmo):** No canto da viewport, um conjunto de eixos (X-Vermelho, Y-Verde, Z-Azul) aponta sempre para a orientação real do mundo, servindo de guia espacial.
 - **Toggles (Checkboxes de Display):** Diretamente listados abaixo dos ícones. Permitem ligar/desligar instantaneamente opções cruciais: a Geometria nativa, o `Grid` do chão Isométrico e a exibição do próprio polígono do `Plane` (o corte vertical).
-- **Glowing Plane (Lâmina Transmissora):** Um plano retangular preenchido de neon/gradiente transparente (Ex: azul neon ciano) que atravessa exatamente a seção fatiada da geometria ativada pelas ferramentas inferiores. 
+- **Glowing Plane (Lâmina Transmissora):** Um plano retangular preenchido de neon/gradiente transparente que atravessa exatamente a seção fatiada da camada ativa. 
 
-## 2. Slicing Control (Painel Esquerdo - Inferior)
-- **Layer Status & Slider:** Denota textualmente qual "Camada" estamos investigando (Ex: `Layer: 24/64`). O slider espesso central arrasta a lâmina transparente do ponto 0 até o 64 ativamente redesenhando os dados do Viewer em Real-Time.
-- **Auto Play:** Um simples botão `Play` que deverá, no código futuro, efetuar a animação fluída (Play/Pause) deslizando automaticamente a fatura pelos 64 layers da geometria.
-- **Axis Selection:** Grupo contendo os eixos absolutos matemáticos `X`, `Y` e `Z` para que a Lâmina assuma o vetor Normal correto de dissecação.
+## 2. Global Control (Painel Esquerdo - Inferior)
+- **Auto Play:** Um simples botão `Play` que efetua a animação fluída (Play/Pause) deslizando automaticamente a fatura pelos layers da geometria (afecta a camada selecionada).
 - **Plane Opacity:** Mini-slider secundário capaz de variar a visibilidade restrita do elemento de neon na *3D Viewport* caso esse esteja obfuscrando nuances do objeto.
+- **Global Export:** Botão para disparar a geração de QOI/GIF.
 
 ## 3. 2D Slice Viewer (Painel Direito - Superior)
-- **A Prancheta de Escultura:** Apresenta a matriz *Cross-Section* totalmente bidimensional ortográfica que reflete *somente* as peças seccionadas pelo 'Glowing Plane', permitindo a aplicação de pintura.
+- **A Prancheta de Escultura:** Apresenta a matriz *Cross-Section* totalmente bidimensional ortográfica que reflete *somente* as peças seccionadas pelo 'Glowing Plane' do layer ativo.
 - **Top HUD:** Telemetria sutil nos cantos indicando o Layer ativo e *Zoom*.
-- **Sistema de Camadas Múltiplas (Independent Layers):** O fluxo de trabalho 2D atua em pilha de camadas. Cada sub-camada pode ser manipulada (movida, rotacionada e redimensionada) de *forma independente*.
+- **Sistema de Camadas Múltiplas (Independent Slicing):** O fluxo de trabalho 2D atua em pilha de camadas. Cada sub-camada possui seu próprio **Eixo (X, Y, Z)** e **Profundidade (Slice Index)** armazenados de forma independente.
+    - Isso permite que o usuário pinte em uma "parede" (Eixo X) em uma camada, e em um "piso" (Eixo Z) em outra, visualizando a interseção no 3D Viewport simultaneamente.
 
   ![Detalhe de Layers e 8-Tiles](voxel_editor_concept_v2.png)
 
