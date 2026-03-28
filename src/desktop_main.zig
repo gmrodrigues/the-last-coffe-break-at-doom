@@ -1,10 +1,10 @@
 const std = @import("std");
 const qoi = @import("qoi.zig");
+const AssetProxy = @import("asset_proxy.zig").AssetProxy;
+const font = @import("font.zig");
 
 // SDL2 Bindings
-const c = @cImport({
-    @cInclude("SDL2/SDL.h");
-});
+const c = @import("sdl.zig").c;
 
 pub const ToolIcon = struct {
     name: []const u8,
@@ -23,8 +23,8 @@ pub const DesktopManager = struct {
     // Main Program Manager Window State
     pm_x: i32 = 50,
     pm_y: i32 = 50,
-    pm_w: i32 = 540,
-    pm_h: i32 = 380,
+    pm_w: i32 = 950,
+    pm_h: i32 = 600,
     pm_minimized: bool = false,
     
     selected_index: ?usize = null,
@@ -38,7 +38,7 @@ pub const DesktopManager = struct {
         const window = c.SDL_CreateWindow(
             "DOOM_OS_311 - Program Manager",
             c.SDL_WINDOWPOS_CENTERED, c.SDL_WINDOWPOS_CENTERED,
-            640, 480,
+            1024, 768,
             c.SDL_WINDOW_SHOWN
         ) orelse return error.SDLWindowFailed;
         
@@ -139,14 +139,14 @@ pub const DesktopManager = struct {
             
             // Grid Icon Interaction
             if (!self.pm_minimized) {
-                const start_x = self.pm_x + 20;
+                const start_x = self.pm_x + 80;
                 const start_y = self.pm_y + 40;
                 
                 for (self.icons.items, 0..) |icon, i| {
-                    const col: i32 = @intCast(i % 4); // Adjusted for larger icons
+                    const col: i32 = @intCast(i % 4);
                     const row: i32 = @intCast(i / 4);
-                    const icon_x = start_x + col * 120;
-                    const icon_y = start_y + row * 120;
+                    const icon_x = start_x + col * 240;
+                    const icon_y = start_y + row * 160;
                     
                     if (mx >= icon_x and mx <= icon_x + 96 and my >= icon_y and my <= icon_y + 96) {
                         self.selected_index = i;
@@ -191,14 +191,14 @@ pub const DesktopManager = struct {
         
         // Grid
         if (!self.pm_minimized) {
-            const start_x = self.pm_x + 20;
+            const start_x = self.pm_x + 80;
             const start_y = self.pm_y + 40;
             
             for (self.icons.items, 0..) |icon, i| {
                 const col: i32 = @intCast(i % 4);
                 const row: i32 = @intCast(i / 4);
-                const icon_x = start_x + col * 120;
-                const icon_y = start_y + row * 120;
+                const icon_x = start_x + col * 240;
+                const icon_y = start_y + row * 160;
                 
                 const dst = c.SDL_Rect{ .x = icon_x, .y = icon_y, .w = 96, .h = 96 };
                 _ = c.SDL_RenderCopy(r, icon.texture, null, &dst);
@@ -209,10 +209,15 @@ pub const DesktopManager = struct {
                     _ = c.SDL_RenderDrawRect(r, &border);
                 }
                 
-                // Label (Black placeholder for text)
+                // Label
                 _ = c.SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
-                const label_r = c.SDL_Rect{ .x = icon_x, .y = icon_y + 100, .w = 96, .h = 12 };
-                _ = c.SDL_RenderFillRect(r, &label_r);
+                const label_w: i32 = @intCast(icon.name.len * 8 * 2); // 8px * 2x scale
+                const label_x = icon_x + 48 - @divTrunc(label_w, 2);
+                
+                const label_bg = c.SDL_Rect{ .x = label_x - 4, .y = icon_y + 100, .w = label_w + 8, .h = 20 };
+                _ = c.SDL_RenderFillRect(r, &label_bg);
+                _ = c.SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+                font.drawText(r, icon.name, label_x, icon_y + 102, 2);
             }
         }
         

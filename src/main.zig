@@ -3,9 +3,8 @@ const entities = @import("entities.zig");
 const renderer = @import("renderer.zig");
 const assets = @import("assets.zig");
 
-const c = @cImport({
-    @cInclude("SDL2/SDL.h");
-});
+// SDL2 Bindings
+const c = @import("sdl.zig").c;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};

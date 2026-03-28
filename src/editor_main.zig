@@ -1,9 +1,7 @@
 const std = @import("std");
 const assets = @import("assets.zig");
 
-const c = @cImport({
-    @cInclude("SDL2/SDL.h");
-});
+const c = @import("sdl.zig").c;
 
 pub const EditorAsset = struct {
     name: [64]u8, // Fixed buffer for filename
