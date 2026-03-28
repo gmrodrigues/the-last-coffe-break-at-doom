@@ -16,7 +16,7 @@ All technical assets must be organized in the following absolute paths:
 - **Components**: `docs/architecture/components.md`.
 - **Design Principles**: `docs/architecture/principles.md`.
 - **Project Backlog**: `docs/architecture/backlog.md`. Tracks sprint progress and IDs.
-- **Implementation Reports**: `docs/reports/`. Standardized review documents generated before execution.
+- **Implementation Reports**: `docs/reports/YYYY/MM/`. Standardized review documents generated before execution.
 - **Task State**: `task.md` (in brain). Tracks the current execution checklist.
 - **Delivery Summary**: `walkthrough.md`. Proof of work for every Sprint/Task.
 
@@ -51,12 +51,14 @@ Supported types: C4, Sequence, User Case, User Journey, Mind Map, Component, Cla
 ## Rule: Backlog Maintenance
 Antigravity MUST maintain `docs/architecture/backlog.md`. Every new RRA must be assigned a unique sequential ID and added to the "Pending Requisitions" section. At the end of every task/sprint, Antigravity MUST move cards to "Completed (Current Sprint)" or "Next Steps".
 
-## Rule: Implementation Reporting
-Every RRA implementation MUST be preceded by a report in `docs/reports/`. The report MUST include:
+Every RRA implementation MUST be preceded by a report in `docs/reports/YYYY/MM/`. The report MUST include:
 - Technical approach (DOD/Memory impact).
 - Review of potential architectural drift.
 - Step-by-step implementation plan.
 Naming convention: `YYYY-MM-DD_HHMM_description.md`.
+
+## Rule: Periodic Directory Audit
+Antigravity MUST periodically (at least once per cycle) audit the directory structure documented in all active skills. If a skill's tree standard in its `SKILL.md` becomes inconsistent with the actual repository state or requires new hierarchical layers (e.g. chronological archiving), Antigravity MUST immediately propose a refactor and update the skill.
 
 ## Rule: No Modern Task Management
 Avoid using modern agile terms like "User Stories" or "Story Points". Use "Sprint", "Requisition", "Resource Allocation", and "Managerial Review".
