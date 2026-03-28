@@ -15,17 +15,19 @@ All technical assets must be organized in the following absolute paths:
 - **Entities**: `docs/domain/entities.md`. Definition of all in-game objects and their SoA structure.
 - **Components**: `docs/architecture/components.md`.
 - **Design Principles**: `docs/architecture/principles.md`.
-- **Project Backlog**: `docs/architecture/backlog.md`. Tracks sprint progress, pending features, and next steps.
+- **Project Backlog**: `docs/architecture/backlog.md`. Tracks sprint progress and IDs.
+- **Implementation Reports**: `docs/reports/`. Standardized review documents generated before execution.
 - **Task State**: `task.md` (in brain). Tracks the current execution checklist.
 - **Delivery Summary**: `walkthrough.md`. Proof of work for every Sprint/Task.
 
 ## Feature Requisition Process (The Workflow)
 
 When the USER requests a new feature, Antigravity MUST:
-1. **Draft a Requisition**: Use the `requisition_form.md` template.
+1. **Draft a Requisition**: Use the `requisition_form.md` template. Assign a unique ID (e.g., **RRA-015**).
 2. **Include PlantUML Views**: Every proposal MUST include at least one relevant diagram (C4, Sequence, User Journey, etc.).
 3. **Draft Stakeholder Commentaries**: Generate brief, satirical reactions from the "Corporate Board" (Architect to HR).
-4. **Update Tech Docs**: If approved, update the relevant files in `docs/domain/` or `docs/architecture/`.
+4. **Generate Implementation Report**: Before starting code changes, generate a report in `docs/reports/` using the format `YYYY-MM-DD_HHMM_[brief_description].md`.
+5. **Update Tech Docs**: If approved, update the relevant files in `docs/domain/` or `docs/architecture/`.
 
 ## Cyclical Architectural Analysis
 
@@ -47,7 +49,14 @@ Requisitions without an architectural view will be REJECTED. Antigravity MUST:
 Supported types: C4, Sequence, User Case, User Journey, Mind Map, Component, Class, Deploy, State Machine.
 
 ## Rule: Backlog Maintenance
-Antigravity MUST maintain `docs/architecture/backlog.md`. Every new RRA must be added to the "Pending Requisitions" section. At the end of every task/sprint, Antigravity MUST move cards to "Completed (Current Sprint)" or "Next Steps".
+Antigravity MUST maintain `docs/architecture/backlog.md`. Every new RRA must be assigned a unique sequential ID and added to the "Pending Requisitions" section. At the end of every task/sprint, Antigravity MUST move cards to "Completed (Current Sprint)" or "Next Steps".
+
+## Rule: Implementation Reporting
+Every RRA implementation MUST be preceded by a report in `docs/reports/`. The report MUST include:
+- Technical approach (DOD/Memory impact).
+- Review of potential architectural drift.
+- Step-by-step implementation plan.
+Naming convention: `YYYY-MM-DD_HHMM_description.md`.
 
 ## Rule: No Modern Task Management
 Avoid using modern agile terms like "User Stories" or "Story Points". Use "Sprint", "Requisition", "Resource Allocation", and "Managerial Review".
