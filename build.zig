@@ -46,6 +46,24 @@ pub fn build(b: *std.Build) void {
     const run_editor_step = b.step("editor", "Run the D.O.O.M Editor");
     run_editor_step.dependOn(&run_editor_cmd.step);
 
+    // --- VOXEL EXECUTABLE ---
+    const voxel_exe = b.addExecutable(.{
+        .name = "tlc_voxel",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/voxel_main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    voxel_exe.linkLibC();
+    voxel_exe.linkSystemLibrary("SDL2");
+    b.installArtifact(voxel_exe);
+
+    const run_voxel_cmd = b.addRunArtifact(voxel_exe);
+    run_voxel_cmd.step.dependOn(b.getInstallStep());
+    const run_voxel_step = b.step("voxel", "Run the D.O.O.M Voxel Forge");
+    run_voxel_step.dependOn(&run_voxel_cmd.step);
+
     // --- TESTS ---
     const exe_unit_tests = b.addTest(.{
         .root_module = b.createModule(.{

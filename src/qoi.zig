@@ -95,3 +95,34 @@ pub fn decode(allocator: std.mem.Allocator, data: []const u8) !QoiImage {
 
     return QoiImage{ .width = width, .height = height, .pixels = pixels, .allocator = allocator };
 }
+
+pub fn encode(allocator: std.mem.Allocator, width: u32, height: u32, pixels: []const u32) ![]u8 {
+    const total_pixels = width * height;
+    const out_size = 14 + (total_pixels * 5) + 8;
+    var out = try allocator.alloc(u8, out_size);
+    
+    @memcpy(out[0..4], "qoif");
+    out[4] = @intCast((width >> 24) & 0xFF);
+    out[5] = @intCast((width >> 16) & 0xFF);
+    out[6] = @intCast((width >> 8) & 0xFF);
+    out[7] = @intCast(width & 0xFF);
+    out[8] = @intCast((height >> 24) & 0xFF);
+    out[9] = @intCast((height >> 16) & 0xFF);
+    out[10] = @intCast((height >> 8) & 0xFF);
+    out[11] = @intCast(height & 0xFF);
+    out[12] = 4; 
+    out[13] = 0; 
+    
+    var p: usize = 14;
+    for (pixels) |px| {
+        out[p] = 0xff; // OP_RGBA
+        out[p+1] = @intCast((px >> 24) & 0xFF);
+        out[p+2] = @intCast((px >> 16) & 0xFF);
+        out[p+3] = @intCast((px >> 8) & 0xFF);
+        out[p+4] = @intCast(px & 0xFF);
+        p += 5;
+    }
+    
+    @memcpy(out[p..p+8], &[_]u8{0,0,0,0,0,0,0,1});
+    return out;
+}
