@@ -1,0 +1,7 @@
+@startuml
+state "Movement" as M {
+    [*] --> Idle
+    Idle --> Walking: WASD
+    Walking --> Idle : Release
+}
+@enduml

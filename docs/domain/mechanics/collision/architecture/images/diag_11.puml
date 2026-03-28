@@ -1,0 +1,9 @@
+@startuml
+package renderer {
+    class Map
+    class Camera
+}
+package main {
+    class InputSystem
+}
+@enduml

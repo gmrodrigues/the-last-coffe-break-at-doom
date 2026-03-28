@@ -1,0 +1,3 @@
+@startuml
+file "src/main.zig" as M
+@enduml

@@ -1,0 +1,6 @@
+@startuml
+artifact src {
+    file main.zig
+    file renderer.zig
+}
+@enduml

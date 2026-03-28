@@ -1,0 +1,4 @@
+@startuml
+Slayer -> (Kick Server)
+Slayer -> (Check Thermal Status)
+@enduml

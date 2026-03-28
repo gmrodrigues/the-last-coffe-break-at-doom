@@ -1,0 +1,7 @@
+@startuml
+[*] --> Stationary
+Stationary --> Rotating: Mouse Move
+Rotating --> Stationary: Mouse Stop
+Stationary --> Strafing: A/D Pressed
+Strafing --> Stationary: A/D Released
+@enduml

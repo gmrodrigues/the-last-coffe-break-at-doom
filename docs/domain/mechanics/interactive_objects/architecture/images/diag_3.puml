@@ -1,0 +1,6 @@
+@startuml
+Player -> InteractSystem: Interact(Entity)
+InteractSystem -> Entity: GetState()
+Entity --> InteractSystem: State: Active
+InteractSystem -> Entity: ApplyAction(HeatUp)
+@enduml

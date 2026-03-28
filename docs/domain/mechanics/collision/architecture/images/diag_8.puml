@@ -1,0 +1,9 @@
+@startuml
+object "Map: Instance" as M1 {
+    grid = [[1,1,1],[1,0,1]]
+}
+object "Camera: Instance" as C1 {
+    x = 1.5
+    y = 1.5
+}
+@enduml

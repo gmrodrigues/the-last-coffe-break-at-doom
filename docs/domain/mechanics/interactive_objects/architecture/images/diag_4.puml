@@ -1,0 +1,7 @@
+@startuml
+package "Entity System" {
+    [PhysicsEngine]
+    [RenderEngine]
+    [FSM_Processor]
+}
+@enduml

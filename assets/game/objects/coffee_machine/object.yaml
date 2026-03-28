@@ -1,0 +1,31 @@
+name: "Industrial Coffee Brewer"
+entity_id: "prop_coffee_brewer_01"
+traits:
+  physics:
+    mass: 12.0
+    friction: 0.9
+    static: true
+    blocking: true
+    pushable: false
+  rendering:
+    type: "static"
+    icon: "icon.qoi"
+  interaction:
+    proximity: 1.0
+    actions:
+      - id: "brew_morning_routine"
+        label: "Brew Morning Routine"
+  healing:
+    rate: 2.0
+    type: "vibe"
+    interaction_cost: "coffee_beans"
+  crafting:
+    station_type: "brewer"
+    recipes:
+      - id: "blackout_espresso"
+        input: { "coffee_beans": 5, "vibe_capsule": 1 }
+        output: "blackout_espresso"
+        time: 5.0
+  destructibility:
+    health: 40
+    hit_effect: "smoke_puff"

@@ -82,8 +82,8 @@ pub fn main() !void {
     }
     const wall_qoi = try encode(allocator, tw, th, wall_pixels);
     defer allocator.free(wall_qoi);
-    try std.fs.cwd().writeFile(.{ .sub_path = "assets/wall.qoi", .data = wall_qoi });
-    std.debug.print("assets/wall.qoi generated\n", .{});
+    try std.fs.cwd().writeFile(.{ .sub_path = "assets/game/env/wall.qoi", .data = wall_qoi });
+    std.debug.print("assets/game/env/wall.qoi generated\n", .{});
 
     const SERVER_STR = 
     "................" ++
@@ -102,7 +102,7 @@ pub fn main() !void {
     "...#@@@@@@@@#..." ++
     "...#@B@..@B@#..." ++
     "...##########...";
-    try genTexFile(allocator, "assets/objects/server/icon.qoi", 16, 16, SERVER_STR);
+    try genTexFile(allocator, "assets/game/objects/server/icon.qoi", 16, 16, SERVER_STR);
     
     const WEAPON_STR = 
     "................" ++
@@ -121,7 +121,7 @@ pub fn main() !void {
     "MMMMMWWWWWWMMMMM" ++
     "MMMMMMMMMMMMMMMM" ++
     "MMMMMMMMMMMMMMMM";
-    try genTexFile(allocator, "assets/objects/weapon/weapon.qoi", 16, 16, WEAPON_STR);
+    try genTexFile(allocator, "assets/game/objects/weapon/icon.qoi", 16, 16, WEAPON_STR);
     
     const FLASH_STR = 
     ".......YY......." ++
@@ -140,7 +140,7 @@ pub fn main() !void {
     "......YYYY......" ++
     ".......YY......." ++
     "................";
-    try genTexFile(allocator, "assets/objects/weapon/flash.qoi", 16, 16, FLASH_STR);
+    try genTexFile(allocator, "assets/game/objects/weapon/flash.qoi", 16, 16, FLASH_STR);
 
     // --- NANO BANANA ICONS ---
     const B_VOXEL = 
@@ -155,7 +155,7 @@ pub fn main() !void {
     "...@@@@@@@@@@..." ++
     "...##########..." ++
     "................";
-    try genTexFile(allocator, "assets/objects/bananas/voxel.qoi", 16, 16, B_VOXEL);
+    try genTexFile(allocator, "assets/tools/mascots/voxel.qoi", 16, 16, B_VOXEL);
 
     const B_EDITOR = 
     "................" ++
@@ -169,7 +169,7 @@ pub fn main() !void {
     "...@@WWWWWW@@..." ++
     "...##########..." ++
     "................";
-    try genTexFile(allocator, "assets/objects/bananas/editor.qoi", 16, 16, B_EDITOR);
+    try genTexFile(allocator, "assets/tools/mascots/editor.qoi", 16, 16, B_EDITOR);
 
     const B_GAME = 
     "................" ++
@@ -182,5 +182,5 @@ pub fn main() !void {
     "...RRRRRRRRRR..." ++
     "...##########..." ++
     "................";
-    try genTexFile(allocator, "assets/objects/bananas/game.qoi", 16, 16, B_GAME);
+    try genTexFile(allocator, "assets/tools/mascots/game.qoi", 16, 16, B_GAME);
 }

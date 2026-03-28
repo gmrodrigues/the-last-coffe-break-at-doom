@@ -1,0 +1,5 @@
+@startuml
+Slayer -> (Walk into Wall)
+(Walk into Wall) --> (Slide along Wall)
+(Walk into Wall) --> (Stop at Boundary)
+@enduml

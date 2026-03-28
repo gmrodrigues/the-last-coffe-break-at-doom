@@ -1,0 +1,33 @@
+name: "Server Rack"
+entity_id: "prop_server_01"
+traits:
+  physics:
+    mass: 150.0
+    friction: 0.8
+    static: true
+    blocking: true
+    pushable: false
+  rendering:
+    type: "directional"
+    billboard: true
+    icon: "icon.qoi"
+  interaction:
+    proximity: 1.5
+    actions:
+      - id: "toggle_power"
+        label: "Power Cycle"
+      - id: "check_thermal"
+        label: "Check Thermal Status"
+  destructibility:
+    health: 50
+    hit_effect: "glitch_flicker"
+    thresholds:
+      - hp_percentage: 0.5
+        sprite_suffix: "_dmg"
+      - hp_percentage: 0.0
+        sprite_suffix: "_ded"
+    resistances:
+      - type: "kinetic"
+        multiplier: 0.5
+      - type: "plasma"
+        multiplier: 1.5

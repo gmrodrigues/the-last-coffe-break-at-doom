@@ -1,0 +1,9 @@
+@startuml
+artifact assets {
+    folder game {
+        folder objects {
+            folder server
+        }
+    }
+}
+@enduml

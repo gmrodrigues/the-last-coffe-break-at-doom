@@ -1,4 +1,7 @@
 # Project Backlog - Managerial Review Cycle
+**name**: DOS_311_BACKLOG
+**icon**: assets/tools/icons/game_icon.png
+**exec**: docs/architecture/backlog.md
 
 ## 🚀 Current Sprint (The Desktop Initiative)
 - [x] **RRA-004**: DOOM_OS_311 Prototype (Sprint 1)
@@ -8,8 +11,9 @@
 - [x] **RRA-015**: Grid-based Desktop Icon Layout
 - [x] **RRA-016**: Dynamic Tool Metadata (YAML Integration)
 - [x] **RRA-017**: Automatic PNG-to-QOI Conversion & Caching
-- [x] **RRA-018**: Modern FPS Movement (WASD + Mouse)
-- [x] **RRA-019**: Physical Collision System (AABB Sliding)
+- [x] **RRA-018**: [Modern FPS Movement](file:///home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/docs/domain/mechanics/modern_movement/modern_movement.md) (WASD + Mouse)
+- [x] **RRA-019**: [Physical Collision System](file:///home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/docs/domain/mechanics/collision/collision.md) (AABB Sliding)
+- [ ] **RRA-020**: [Interactive Object System](file:///home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/docs/domain/mechanics/interactive_objects/interactive_objects.md) (Directional Entities)
 
 ## ⏳ Next Steps (Sprint 2)
 - [ ] **RRA-008**: Window dragging/minimizing for DOOM_OS_311

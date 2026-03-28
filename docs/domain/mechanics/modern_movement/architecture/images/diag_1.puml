@@ -1,0 +1,9 @@
+@startuml
+class Camera {
+    +dir_x: float
+    +dir_y: float
+    +plane_x: float
+    +plane_y: float
+    +rotate(angle)
+}
+@enduml

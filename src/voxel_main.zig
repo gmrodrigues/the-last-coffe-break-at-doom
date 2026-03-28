@@ -377,16 +377,16 @@ fn exportSprites(allocator: std.mem.Allocator, grid: *const [GRID][GRID][GRID]u8
         const data = try qoi.encode(allocator, TILE_W, TILE_H, &buf);
         defer allocator.free(data);
         var name: [64]u8 = undefined;
-        const path = try std.fmt.bufPrint(&name, "assets/objects/voxels/voxel_{}.qoi", .{a});
+        const path = try std.fmt.bufPrint(&name, "assets/game/objects/voxels/voxel_{}.qoi", .{a});
         try std.fs.cwd().writeFile(.{ .sub_path = path, .data = data });
     }
 
     // Export Consolidated GIF
     const gif_data = try gif.encode(allocator, TILE_W, TILE_H, @ptrCast(frames_indices), &PALETTE);
     defer allocator.free(gif_data);
-    try std.fs.cwd().writeFile(.{ .sub_path = "assets/objects/voxels/anim.gif", .data = gif_data });
+    try std.fs.cwd().writeFile(.{ .sub_path = "assets/game/objects/voxels/anim.gif", .data = gif_data });
 
-    std.debug.print("Exported 8 sprites and anim.gif to assets/objects/voxels/\n", .{});
+    std.debug.print("Exported 8 sprites and anim.gif to assets/game/objects/voxels/\n", .{});
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────

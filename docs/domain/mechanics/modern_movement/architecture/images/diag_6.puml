@@ -1,0 +1,7 @@
+@startuml
+start
+:Get Mouse Offset;
+:Apply Rotation to Dir Vector;
+:Apply Rotation to Plane Vector;
+stop
+@enduml

@@ -1,0 +1,5 @@
+@startuml
+User -> Input: Move Mouse Right
+Input -> Camera: rotate(mouse_x * sensitivity)
+Camera -> Camera: Update dir_x, dir_y
+@enduml

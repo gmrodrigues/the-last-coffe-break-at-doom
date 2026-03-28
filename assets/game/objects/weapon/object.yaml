@@ -1,0 +1,28 @@
+name: "Standard Issue Plasma Gun"
+entity_id: "weapon_plasma_01"
+traits:
+  physics:
+    mass: 2.5
+    friction: 0.1
+    static: false
+    blocking: false
+    pushable: true
+  rendering:
+    type: "billboard"
+    icon: "icon.qoi"
+  interaction:
+    proximity: 0.0
+    actions:
+      - id: "fire"
+        label: "Fire"
+      - id: "reload"
+        label: "Reload"
+  destructibility:
+    health: 100
+    hit_effect: "sparks"
+    thresholds:
+      - hp_percentage: 0.2
+        sprite_suffix: "_broken"
+    resistances:
+      - type: "kinetic"
+        multiplier: 1.0

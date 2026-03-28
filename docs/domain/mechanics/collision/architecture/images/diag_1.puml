@@ -1,0 +1,14 @@
+@startuml
+class Map {
+    +get(x, y) int
+}
+class Camera {
+    +x float
+    +y float
+}
+class CollisionSystem {
+    +check(cam, map)
+}
+CollisionSystem ..> Map
+CollisionSystem ..> Camera
+@enduml

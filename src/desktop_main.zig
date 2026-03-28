@@ -236,7 +236,7 @@ pub fn main() !void {
     defer desktop.deinit();
     
     // Load metadata
-    try desktop.loadTools("assets/tools.yaml");
+    try desktop.loadTools("assets/tools/metadata/tools.yaml");
     
     var event: c.SDL_Event = undefined;
     while (true) {

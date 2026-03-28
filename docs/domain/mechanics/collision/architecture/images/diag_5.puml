@@ -1,0 +1,8 @@
+@startuml
+state "Movement State" as MS {
+    [*] --> Free
+    Free --> Colliding: Contact Wall
+    Colliding --> Sliding: Directional Adjustment
+    Sliding --> Free: Away from wall
+}
+@enduml

@@ -1,0 +1,4 @@
+interaction:
+  default_proximity: 1.5
+  max_concurrent_actions: 4
+  input_key: "E"

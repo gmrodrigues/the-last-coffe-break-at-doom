@@ -1,0 +1,5 @@
+@startuml
+node "DOOM_OS_311" {
+    [AssetLoader] --> [EntityFactory]
+}
+@enduml

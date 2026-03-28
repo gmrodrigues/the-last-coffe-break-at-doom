@@ -67,22 +67,22 @@ pub fn main() !void {
     };
     
     // Load Textures from Disk
-    var wall_tex = try assets.Texture.load(allocator, "assets/wall.qoi");
+    var wall_tex = try assets.Texture.load(allocator, "assets/game/env/wall.qoi");
     defer wall_tex.deinit();
 
     // 8-Directional Server Textures
-    var s_n = try assets.Texture.load(allocator, "assets/objects/server/N.qoi"); defer s_n.deinit();
-    var s_ne = try assets.Texture.load(allocator, "assets/objects/server/NE.qoi"); defer s_ne.deinit();
-    var s_e = try assets.Texture.load(allocator, "assets/objects/server/E.qoi"); defer s_e.deinit();
-    var s_se = try assets.Texture.load(allocator, "assets/objects/server/SE.qoi"); defer s_se.deinit();
-    var s_s = try assets.Texture.load(allocator, "assets/objects/server/S.qoi"); defer s_s.deinit();
-    var s_sw = try assets.Texture.load(allocator, "assets/objects/server/SW.qoi"); defer s_sw.deinit();
-    var s_w = try assets.Texture.load(allocator, "assets/objects/server/W.qoi"); defer s_w.deinit();
-    var s_nw = try assets.Texture.load(allocator, "assets/objects/server/NW.qoi"); defer s_nw.deinit();
+    var s_n = try assets.Texture.load(allocator, "assets/game/objects/server/N.qoi"); defer s_n.deinit();
+    var s_ne = try assets.Texture.load(allocator, "assets/game/objects/server/NE.qoi"); defer s_ne.deinit();
+    var s_e = try assets.Texture.load(allocator, "assets/game/objects/server/E.qoi"); defer s_e.deinit();
+    var s_se = try assets.Texture.load(allocator, "assets/game/objects/server/SE.qoi"); defer s_se.deinit();
+    var s_s = try assets.Texture.load(allocator, "assets/game/objects/server/S.qoi"); defer s_s.deinit();
+    var s_sw = try assets.Texture.load(allocator, "assets/game/objects/server/SW.qoi"); defer s_sw.deinit();
+    var s_w = try assets.Texture.load(allocator, "assets/game/objects/server/W.qoi"); defer s_w.deinit();
+    var s_nw = try assets.Texture.load(allocator, "assets/game/objects/server/NW.qoi"); defer s_nw.deinit();
 
-    var weapon_tex = try assets.Texture.load(allocator, "assets/objects/weapon/weapon.qoi");
+    var weapon_tex = try assets.Texture.load(allocator, "assets/game/objects/weapon/icon.qoi");
     defer weapon_tex.deinit();
-    var flash_tex = try assets.Texture.load(allocator, "assets/objects/weapon/flash.qoi");
+    var flash_tex = try assets.Texture.load(allocator, "assets/game/objects/weapon/flash.qoi");
     defer flash_tex.deinit();
     
     var render_target = renderer.Renderer{

@@ -1,0 +1,6 @@
+@startuml
+node "Workstation" {
+    [Mouse]
+    [Keyboard]
+}
+@enduml

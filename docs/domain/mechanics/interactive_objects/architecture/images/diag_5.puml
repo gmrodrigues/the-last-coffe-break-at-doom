@@ -1,0 +1,9 @@
+@startuml
+state "Server State" as SS {
+    [*] --> Off
+    Off --> Booting: Power On
+    Booting --> Online: System Ready
+    Online --> Overheated: High Load
+    Overheated --> Off: Shutdown
+}
+@enduml

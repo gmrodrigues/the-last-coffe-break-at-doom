@@ -1,0 +1,6 @@
+@startuml
+package "Collision Engine" {
+    [Input Polling] --> [Position Logic]
+    [Position Logic] --> [Map Validation]
+}
+@enduml

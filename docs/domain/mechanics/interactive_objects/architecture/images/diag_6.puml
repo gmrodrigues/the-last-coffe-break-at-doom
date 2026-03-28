@@ -1,0 +1,11 @@
+@startuml
+start
+:Check Proximity;
+if (Within Range?) then (yes)
+  :Display Interaction Menu;
+  :Wait for Input;
+else (no)
+  :Hide Menu;
+endif
+stop
+@enduml

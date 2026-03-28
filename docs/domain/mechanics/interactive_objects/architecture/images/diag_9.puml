@@ -1,0 +1,11 @@
+@startuml
+robust "Interaction Window" as IW
+@0
+IW is Closed
+@5
+IW is Open
+@10
+IW is Processing
+@12
+IW is Closed
+@enduml

@@ -1,0 +1,5 @@
+@startuml
+node "DOOM_OS_311" {
+    [tlc_at_doom.exe]
+}
+@enduml

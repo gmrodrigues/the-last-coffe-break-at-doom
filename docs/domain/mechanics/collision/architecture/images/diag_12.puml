@@ -1,0 +1,6 @@
+@startuml
+class "Entity" <<Stereotype>>
+class "Slayer" {
+    +isSolid: true
+}
+@enduml

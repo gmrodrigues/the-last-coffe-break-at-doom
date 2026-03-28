@@ -1,0 +1,6 @@
+@startuml
+[*] --> Idle
+Idle --> Interacting: Player Near
+Interacting --> StateChange: Action Triggered
+StateChange --> Idle
+@enduml

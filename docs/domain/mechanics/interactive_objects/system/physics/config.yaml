@@ -1,0 +1,4 @@
+physics:
+  gravity: 1.0 # 2.5D pseudo-gravity
+  default_friction: 0.5
+  air_drag: 0.1

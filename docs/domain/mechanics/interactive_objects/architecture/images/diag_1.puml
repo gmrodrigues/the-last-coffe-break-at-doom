@@ -1,0 +1,10 @@
+@startuml
+class Entity {
+    +physics: ObjectPhysics
+    +vision: ObjectVision
+    +state: ObjectState
+}
+Entity *-- ObjectPhysics
+Entity *-- ObjectVision
+Entity *-- ObjectState
+@enduml

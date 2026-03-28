@@ -1,0 +1,4 @@
+world:
+  default_tile: 0 # Walkable
+  solid_threshold: 1 # Values >= 1 are solid
+  grid_scale: 1.0 # 1 unit = 1 tile

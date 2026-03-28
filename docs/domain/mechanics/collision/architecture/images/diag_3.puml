@@ -1,0 +1,9 @@
+@startuml
+Player -> InputSystem: PRESS W
+InputSystem -> Camera: Try Move (X, Y)
+Camera -> Map: Check(NewX, OldY)
+Map --> Camera: 0 (Free)
+Camera -> Map: Check(OldX, NewY)
+Map --> Camera: 1 (Wall)
+Camera -> Player: Update (NewX, OldY)
+@enduml

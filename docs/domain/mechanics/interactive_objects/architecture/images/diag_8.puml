@@ -1,0 +1,6 @@
+@startuml
+object "Server:Prop" as S1 {
+    mass = 150kg
+    state = Overheated
+}
+@enduml

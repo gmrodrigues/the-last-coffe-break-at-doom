@@ -1,0 +1,15 @@
+name: "Voxel Animation Suite"
+entity_id: "prop_voxel_base"
+traits:
+  physics:
+    mass: 10.0
+    friction: 0.5
+    static: false
+  rendering:
+    type: "animated"
+    icon: "voxel_icon.qoi"
+  interaction:
+    proximity: 2.0
+    actions:
+      - id: "play_animation"
+        label: "Play sequence"

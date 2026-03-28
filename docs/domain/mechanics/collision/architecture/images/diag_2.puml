@@ -1,0 +1,9 @@
+@startuml
+[*] --> Idle
+Idle --> Moving: Input Detected
+Moving --> CollisionCheck: Update Position
+CollisionCheck --> Valid: Path Clear
+CollisionCheck --> Sliding: Wall Detected
+Valid --> Idle
+Sliding --> Idle
+@enduml

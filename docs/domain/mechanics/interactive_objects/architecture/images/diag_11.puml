@@ -1,0 +1,6 @@
+@startuml
+package entities {
+    class ObjectPhysics
+    class ObjectState
+}
+@enduml

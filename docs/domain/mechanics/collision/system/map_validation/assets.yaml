@@ -1,0 +1,6 @@
+environment:
+  textures:
+    - path: "assets/game/env/wall.qoi"
+      role: "static_collider"
+    - path: "assets/game/env/floor.qoi"
+      role: "navigable_surface"

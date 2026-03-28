@@ -26,7 +26,7 @@ All technical assets must be organized in the following absolute paths:
 
 When the USER requests a new feature, Antigravity MUST:
 1. **Draft a Requisition**: Use the `requisition_form.md` template. Assign a unique ID (e.g., **RRA-015**).
-2. **Include PlantUML Views**: Every proposal MUST include at least one relevant diagram (C4, Sequence, User Journey, etc.).
+2. **Include PlantUML Views**: Every proposal MUST include at least one relevant diagram (C4, Sequence, User Journey, etc.). All docs must reference the compiled image of the diagram.
 3. **Draft Stakeholder Commentaries**: Generate brief, satirical reactions from the "Corporate Board" (Architect to HR).
 4. **Generate Implementation Report**: Before starting code changes, generate a report in `docs/reports/` using the format `YYYY-MM-DD_HHMM_[brief_description].md`.
 5. **Update Tech Docs**: If approved, update the relevant files in `docs/domain/` or `docs/architecture/`.

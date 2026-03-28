@@ -1,0 +1,11 @@
+@startuml
+robust "Input Frequency" as IF
+@0
+IF is Waiting
+@4
+IF is Sampling
+@6
+IF is Processing
+@16
+IF is Waiting
+@enduml

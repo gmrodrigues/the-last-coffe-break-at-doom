@@ -1,0 +1,11 @@
+@startuml
+concise "Movement Frame" as MF
+@0
+MF is Polling
+@2
+MF is Collision
+@3
+MF is Rendering
+@16
+MF is Polling
+@enduml

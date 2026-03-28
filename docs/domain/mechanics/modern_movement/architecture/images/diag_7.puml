@@ -1,0 +1,4 @@
+@startuml
+Slayer -> (Navigate Office)
+Slayer -> (Strafe past Cubicles)
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+start
+if (Key Pressed?) then (yes)
+  :Calculate New X, Y;
+  if (X Clear?) then (yes)
+    :Update X;
+  else (no)
+    :Keep Old X;
+  endif
+  if (Y Clear?) then (yes)
+    :Update Y;
+  else (no)
+    :Keep Old Y;
+  endif
+endif
+stop
+@enduml
