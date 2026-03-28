@@ -13,6 +13,8 @@ All technical assets must be organized in the following absolute paths:
 - **Core Architecture**: `Tech.md`. Contains SoA/DOD, memory management, and binary formats.
 - **Ubiquitous Language**: `docs/domain/ubiquitous_language.md`.
 - **Entities**: `docs/domain/entities.md`. Definition of all in-game objects and their SoA structure.
+- **Mechanics**: `docs/domain/mechanics/`. Specification documents for all game-feel features.
+- **Editor Features**: `docs/editors/features/`. Workflow and specifications for internal tool enhancements.
 - **Components**: `docs/architecture/components.md`.
 - **Design Principles**: `docs/architecture/principles.md`.
 - **Project Backlog**: `docs/architecture/backlog.md`. Tracks sprint progress and IDs.
