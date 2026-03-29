@@ -1,0 +1,4 @@
+collision_bridge:
+  max_substeps: 4
+  epsilon: 0.001
+  spatial_grid_size: 4.0

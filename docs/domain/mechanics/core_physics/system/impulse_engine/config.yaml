@@ -1,0 +1,4 @@
+impulse_engine:
+  gravity: 1.0
+  terminal_velocity: 10.0
+  restitution: 0.2

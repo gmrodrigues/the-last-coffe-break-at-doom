@@ -1,0 +1,9 @@
+map_forge:
+  snap_to_grid: 0.25
+  default_wall_height: 3.0
+  default_wall_thickness: 0.2
+  default_floor_texture: "assets/game/env/floor_default.qoi"
+  default_wall_texture: "assets/game/env/wall_default.qoi"
+  variable_defaults:
+    $ceiling_height: 4.0
+    $ambient_vibe: 0.8
