@@ -9,6 +9,9 @@
 - [ ] **RRA-010**: Gaslight Dialogue Editor port to DOOM_OS_311
 
 ## 📥 Pending Requisitions (Backlog)
+- [ ] **RRA-021**: [Map Forge Core](docs/editors/features/map_forge/RRA-021_map_editor.md) (Foundation)
+- [ ] **RRA-022**: Wall Face Protocol (Procedural Extrusion)
+- [ ] **RRA-023**: Verticality & Ceiling Areas (Canvas Support)
 - [ ] **RRA-011**: Multi-layer Parallax Renderer
 - [ ] **RRA-012**: Physical Exorcism (v2) - Advanced Collisions
 - [ ] **RRA-013**: Corporate Compliance UI (HR Modifiers)
