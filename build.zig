@@ -82,6 +82,24 @@ pub fn build(b: *std.Build) void {
     const run_desktop_step = b.step("desktop", "Run the D.O.O.M_OS_311 Desktop");
     run_desktop_step.dependOn(&run_desktop_cmd.step);
 
+    // --- MAP FORGE EXECUTABLE ---
+    const map_forge_exe = b.addExecutable(.{
+        .name = "tlc_map_forge",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/map_forge.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    map_forge_exe.linkLibC();
+    map_forge_exe.linkSystemLibrary("SDL2");
+    b.installArtifact(map_forge_exe);
+
+    const run_map_forge_cmd = b.addRunArtifact(map_forge_exe);
+    run_map_forge_cmd.step.dependOn(b.getInstallStep());
+    const run_map_forge_step = b.step("mapforge", "Run the D.O.O.M Map Forge");
+    run_map_forge_step.dependOn(&run_map_forge_cmd.step);
+
     // --- TESTS ---
     const exe_unit_tests = b.addTest(.{
         .root_module = b.createModule(.{

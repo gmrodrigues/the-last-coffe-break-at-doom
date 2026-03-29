@@ -1,0 +1,36 @@
+mapforge
++- run exe tlc_map_forge
+   +- install
+      +- install tlc_map_forge
+         +- compile exe tlc_map_forge Debug native 2 errors
+src/map_forge.zig:62:41: error: struct 'array_list.Aligned(map_forge.Area,null)' has no member named 'init'
+            .areas = std.ArrayList(Area).init(allocator),
+                     ~~~~~~~~~~~~~~~~~~~^~~~~
+/home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/array_list.zig:606:12: note: struct declared here
+    return struct {
+           ^~~~~~
+referenced by:
+    main: src/map_forge.zig:104:29
+    callMain [inlined]: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:627:37
+    callMainWithArgs [inlined]: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:587:20
+    main: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:602:28
+    1 reference(s) hidden; use '-freference-trace=5' to see all references
+src/map_forge.zig:108:21: error: member function expected 2 argument(s), found 1
+    try region.areas.append(Area.init(allocator));
+        ~~~~~~~~~~~~^~~~~~~
+/home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/array_list.zig:893:13: note: function declared here
+        pub fn append(self: *Self, gpa: Allocator, item: T) Allocator.Error!void {
+        ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+error: the following command failed with 2 compilation errors:
+/home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig build-exe -I/usr/include/SDL2 -D_REENTRANT -L/usr/lib/x86_64-linux-gnu -lSDL2 -ODebug -Mroot=/home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/src/map_forge.zig -lc --cache-dir .zig-cache --global-cache-dir /home/glauber/.cache/zig --name tlc_map_forge --zig-lib-dir /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/ --listen=-
+
+Build Summary: 8/13 steps succeeded; 1 failed
+mapforge transitive failure
++- run exe tlc_map_forge transitive failure
+   +- compile exe tlc_map_forge Debug native 2 errors
+   +- install transitive failure
+      +- install tlc_map_forge transitive failure
+         +- compile exe tlc_map_forge Debug native (reused)
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/89c4a7359424c8c8327d0a4f7977348c/build /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig /home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom .zig-cache /home/glauber/.cache/zig --seed 0x3d277101 -Zb7e2f8fadb618c77 mapforge
