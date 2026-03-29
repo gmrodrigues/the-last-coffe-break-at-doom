@@ -38,6 +38,14 @@ At the end of every implementation cycle, Antigravity MUST perform a **Drift Ana
 - **Vibe Drift**: Check if any "modernisms" have leaked into the 2.5D renderer.
 - **Backlog Reconciliation**: Move completed items to the "Audit Trail" and update pending requisition priorities in `docs/architecture/backlog.md`.
 - **Compliance**: Review against `docs/architecture/principles.md`.
+- **Technical Debt Logging**: Any structural 'hacks' or implementation fragments discovered MUST be filed into the Technical Debt Backlog (`docs/architecture/technical_debt.md`).
+
+## Rule: Engine vs Editor Separation Philosophy
+- **The Game Engine**: MUST remain a STRICT SDL2 Raycasting solution. It is bound by the retro limitations of the 2.5D format.
+- **The internal Editors (Map Forge, Voxel Forge, etc.)**: MUST use **Raylib + Nuklear**. This allows the editors to bypass the rendering limitations of the raycaster (enabling full 3D viewport flexibility, high-performance UI) while generating an interchangeable game data format that the strict SDL raycasting engine can load and execute natively.
+
+## Rule: Technical Debt Governance
+Antigravity MUST actively track and document technical debt in `docs/architecture/technical_debt.md`. When encountering non-compliant implementations (e.g., bare SDL code instead of Nuklear ZUI standards), Antigravity MUST file a `TD-###` card to the Active Tech Debt register to maintain architectural transparency. **Mandatory:** Every Technical Debt card MUST include a direct link to the specific Stakeholder Memorandum (Coffee Presentation) or architectural discussion that initiated or discovered the debt.
 
 ## Rule: PlantUML Mandatory & Local Rendering
 
@@ -51,7 +59,7 @@ Requisitions without an architectural view will be REJECTED. Antigravity MUST:
 Supported types: C4, Sequence, User Case, User Journey, Mind Map, Component, Class, Deploy, State Machine.
 
 ## Rule: Backlog Maintenance
-Antigravity MUST maintain `docs/architecture/backlog.md`. Every new RRA must be assigned a unique sequential ID and added to the "Pending Requisitions" section. At the end of every task/sprint, Antigravity MUST move cards to "Completed (Current Sprint)" or "Next Steps".
+Antigravity MUST maintain `docs/architecture/backlog.md`. Every new RRA must be assigned a unique sequential ID and added to the "Pending Requisitions" section. At the end of every task/sprint, Antigravity MUST move cards to "Completed (Current Sprint)" or "Next Steps". **Mandatory:** Every item added to the backlog MUST reference or link to the specific Stakeholder Memorandum or source discussion that initiated it.
 
 Every RRA implementation MUST be preceded by a report in `docs/reports/YYYY/MM/`. The report MUST include:
 - Technical approach (DOD/Memory impact).
@@ -64,3 +72,9 @@ Antigravity MUST periodically (at least once per cycle) audit the directory stru
 
 ## Rule: No Modern Task Management
 Avoid using modern agile terms like "User Stories" or "Story Points". Use "Sprint", "Requisition", "Resource Allocation", and "Managerial Review".
+
+## Rule: The Corporate Memorandum (Coffee Presentation)
+When a major architectural paradigm shift occurs, Antigravity MUST file a Corporate Memorandum.
+- **Format**: Memorandums MUST take the narrative form of a "Coffee Presentation" transcript or watercooler gossip session.
+- **Content**: Must include the technical details wrapped in corporate satire, featuring direct quotes, complaints, and gossipy feedback from key stakeholders (e.g., The Architect, The Junior Dev, Corporate HR, The Vibe Curator, The Retro Computing Purist). It must be funny and insightful.
+- **Location**: Store inside `docs/reports/YYYY/MM/` with the prefix `YYYY-MM-DD_HHMM_MEMO_`.

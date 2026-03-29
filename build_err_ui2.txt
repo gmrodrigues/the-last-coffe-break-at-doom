@@ -1,0 +1,36 @@
+mapforge
++- run exe tlc_map_forge
+   +- install
+      +- install tlc_map_forge
+         +- compile exe tlc_map_forge Debug native 1 errors
+src/map_forge.zig:130:32: error: expected type '?*cimport.struct_SDL_Window', found '*cimport.struct_SDL_Window'
+    const ctx = nk.nk_sdl_init(window, renderer);
+                               ^~~~~~
+src/map_forge.zig:130:32: note: pointer type child 'cimport.struct_SDL_Window' cannot cast into pointer type child 'cimport.struct_SDL_Window'
+.zig-cache/o/f98a99d30dbcacca4d3456fbd8ff8c87/cimport.zig:33842:31: note: opaque declared here
+pub const struct_SDL_Window = opaque {};
+                              ^~~~~~~~~
+.zig-cache/o/1320bc49c681017f6fd9e007f90c1e59/cimport.zig:35632:31: note: opaque declared here
+pub const struct_SDL_Window = opaque {};
+                              ^~~~~~~~~
+.zig-cache/o/1320bc49c681017f6fd9e007f90c1e59/cimport.zig:37589:32: note: parameter type declared here
+pub extern fn nk_sdl_init(win: ?*SDL_Window, renderer: ?*SDL_Renderer) [*c]struct_nk_context;
+                               ^~~~~~~~~~~~
+referenced by:
+    callMain [inlined]: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:627:37
+    callMainWithArgs [inlined]: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:587:20
+    main: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:602:28
+    1 reference(s) hidden; use '-freference-trace=4' to see all references
+error: the following command failed with 1 compilation errors:
+/home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig build-exe -I/usr/include/SDL2 -D_REENTRANT -L/usr/lib/x86_64-linux-gnu -lSDL2 -cflags -std=c99 -pedantic -- /home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/src/nuklear.c -ODebug -I /home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/src -Mroot=/home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/src/map_forge.zig -lc --cache-dir .zig-cache --global-cache-dir /home/glauber/.cache/zig --name tlc_map_forge --zig-lib-dir /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/ --listen=-
+
+Build Summary: 8/13 steps succeeded; 1 failed
+mapforge transitive failure
++- run exe tlc_map_forge transitive failure
+   +- compile exe tlc_map_forge Debug native 1 errors
+   +- install transitive failure
+      +- install tlc_map_forge transitive failure
+         +- compile exe tlc_map_forge Debug native (reused)
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/821ebdc9f1c47c63e5bf54ab642e7c71/build /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig /home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom .zig-cache /home/glauber/.cache/zig --seed 0x7380304f -Z3c6c86f45077411e mapforge

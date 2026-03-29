@@ -1,0 +1,32 @@
+mapforge
++- run exe tlc_map_forge
+   +- compile exe tlc_map_forge Debug native 3 errors
+src/map_forge.zig:130:9: error: local variable is never mutated
+    var ctx = nk.nk_sdl_init(window, renderer);
+        ^~~
+src/map_forge.zig:130:9: note: consider using 'const'
+src/map_forge.zig:6:12: error: C import failed
+const nk = @cImport({
+           ^~~~~~~~
+referenced by:
+    main: src/map_forge.zig:130:15
+    callMain [inlined]: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:627:37
+    callMainWithArgs [inlined]: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:587:20
+    main: /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/std/start.zig:602:28
+    1 reference(s) hidden; use '-freference-trace=5' to see all references
+.zig-cache/o/563dcc90223ae5877d2dad39ce2e49f3/cimport.h:1:10: error: 'nuklear.h' file not found
+#include <nuklear.h>
+         ^
+error: the following command failed with 3 compilation errors:
+/home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig build-exe -I/usr/include/SDL2 -D_REENTRANT -L/usr/lib/x86_64-linux-gnu -lSDL2 -cflags -std=c99 -pedantic -- /home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/src/nuklear.c -ODebug -Mroot=/home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/src/map_forge.zig -lc --cache-dir .zig-cache --global-cache-dir /home/glauber/.cache/zig --name tlc_map_forge --zig-lib-dir /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/ --listen=-
+
+Build Summary: 8/13 steps succeeded; 1 failed
+mapforge transitive failure
++- run exe tlc_map_forge transitive failure
+   +- compile exe tlc_map_forge Debug native 3 errors
+   +- install transitive failure
+      +- install tlc_map_forge transitive failure
+         +- compile exe tlc_map_forge Debug native (reused)
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/b0bd09c0acf27307ccb1d286df143021/build /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig /home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom .zig-cache /home/glauber/.cache/zig --seed 0x887cf163 -Z5eb7319adc09a0c3 mapforge

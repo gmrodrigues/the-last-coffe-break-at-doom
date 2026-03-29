@@ -1,0 +1,20 @@
+mapforge
++- run exe tlc_map_forge
+   +- compile exe tlc_map_forge Debug native 1 errors
+src/map_forge.zig:191:45: error: @intFromFloat must have a known result type
+            var p_rect = sdl.SDL_Rect{ .x = @intFromFloat(v.x) - 3, .y = @intFromFloat(v.y) - 3, .w = 6, .h = 6 };
+                                            ^~~~~~~~~~~~~~~~~~
+src/map_forge.zig:191:45: note: use @as to provide explicit result type
+error: the following command failed with 1 compilation errors:
+/home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig build-exe -I/usr/include/SDL2 -D_REENTRANT -L/usr/lib/x86_64-linux-gnu -lSDL2 -ODebug -Mroot=/home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom/src/map_forge.zig -lc --cache-dir .zig-cache --global-cache-dir /home/glauber/.cache/zig --name tlc_map_forge --zig-lib-dir /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig/ --listen=-
+
+Build Summary: 8/13 steps succeeded; 1 failed
+mapforge transitive failure
++- run exe tlc_map_forge transitive failure
+   +- compile exe tlc_map_forge Debug native 1 errors
+   +- install transitive failure
+      +- install tlc_map_forge transitive failure
+         +- compile exe tlc_map_forge Debug native (reused)
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/89c4a7359424c8c8327d0a4f7977348c/build /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/bin/zig /home/linuxbrew/.linuxbrew/Cellar/zig/0.15.2_1/lib/zig /home/glauber/arquivos/projetos/code-labs/the-last-coffe-brak-at-doom .zig-cache /home/glauber/.cache/zig --seed 0xcc33ad3c -Z304a3f55e9dcd813 mapforge

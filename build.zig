@@ -93,6 +93,11 @@ pub fn build(b: *std.Build) void {
     });
     map_forge_exe.linkLibC();
     map_forge_exe.linkSystemLibrary("SDL2");
+    map_forge_exe.addCSourceFile(.{
+        .file = b.path("src/nuklear.c"),
+        .flags = &[_][]const u8{ "-std=c99", "-pedantic" },
+    });
+    map_forge_exe.addIncludePath(b.path("src"));
     b.installArtifact(map_forge_exe);
 
     const run_map_forge_cmd = b.addRunArtifact(map_forge_exe);
